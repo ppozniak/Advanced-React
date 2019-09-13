@@ -110,6 +110,7 @@
       }
     ],
     "jsx-a11y/href-no-hash": "off",
+    "react/state-in-constructor": 0,
     "jsx-a11y/anchor-is-valid": [
       "warn",
       {

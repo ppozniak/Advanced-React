@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { ThemeProvider, injectGlobal } from 'styled-components';
+import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import Header from './Header';
 import Meta from './Meta';
 
@@ -11,6 +11,7 @@ const theme = {
   offWhite: '#EDEDED',
   maxWidth: '1000px',
   bs: '0 12px 24px 0 rgba(0, 0, 0, 0.09)',
+  blue: '#0096ff',
 };
 
 const StyledPage = styled.div`
@@ -24,7 +25,7 @@ const Inner = styled.div`
   padding: 2rem;
 `;
 
-injectGlobal`
+const GlobalStyles = createGlobalStyle`
   @font-face {
     font-family: 'radnika_next';
     src: url('/static/radnikanext-medium-webfont.woff2') format('woff2');
@@ -43,21 +44,24 @@ injectGlobal`
     margin: 0;
     font-size: 1.5rem;
     line-height: 2;
-    font-family: 'radnika_next';
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
   }
   a {
-    text-decoration: none;
-    color: ${theme.black};
+    text-decoration: underline;
+    color: ${theme.blue};
   }
 `;
 
 const Page = ({ children }) => (
   <ThemeProvider theme={theme}>
-    <StyledPage>
-      <Meta />
-      <Header />
-      <Inner>{children}</Inner>
-    </StyledPage>
+    <>
+      <GlobalStyles />
+      <StyledPage>
+        <Meta />
+        <Header />
+        <Inner>{children}</Inner>
+      </StyledPage>
+    </>
   </ThemeProvider>
 );
 

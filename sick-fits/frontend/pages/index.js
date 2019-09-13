@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Query } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import styled from 'styled-components';
 import Item from '../components/Item';
@@ -20,20 +20,18 @@ const ALL_ITEMS_QUERY = gql`
   }
 `;
 
-class Home extends Component {
-  render() {
-    return (
-      <ItemsContainer>
-        <Query query={ALL_ITEMS_QUERY}>
-          {({ loading, data, error }) => {
-            if (error) return <strong>{error.message}</strong>;
-            if (loading) return <strong>Loading inks, please wait.</strong>;
-            return data.items.map(item => <Item key={item.id} {...item} />);
-          }}
-        </Query>
-      </ItemsContainer>
-    );
-  }
-}
+const Home = () => {
+  const { data, loading, error } = useQuery(ALL_ITEMS_QUERY);
+
+  if (loading) return <i>Loading...</i>;
+  if (error) return <strong>Error :(</strong>;
+  return (
+    <ItemsContainer>
+      {data.items.map(item => (
+        <Item key={item.id} {...item} />
+      ))}
+    </ItemsContainer>
+  );
+};
 
 export default Home;
