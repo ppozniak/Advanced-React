@@ -5,9 +5,10 @@ import formatMoney from '../lib/formatMoney';
 
 const ItemContainer = styled.div`
   padding: 1rem;
-  border: 3px double ${p => p.theme.black};
   text-align: center;
   min-height: 10rem;
+  box-shadow: 3px 3px 12px #00000043;
+  overflow: hidden;
 `;
 
 const Thumbnail = styled.img`
@@ -16,25 +17,54 @@ const Thumbnail = styled.img`
   max-height: 125px;
   margin: 0 auto;
   object-fit: cover;
-  transform: rotate(3deg);
+  object-position: top center;
+  transform: rotate(3deg) scaleX(1.2);
+  margin-bottom: 20px;
+  margin-top: -20px;
 `;
 
-const Title = styled.a`
+const FakeThumbnail = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 125px;
+  object-position: top center;
+  transform: rotate(3deg) scaleX(1.2);
+  background-color: #ccc;
+  text-align: left;
+  margin-bottom: 20px;
+  margin-top: -20px;
+
+  &:before {
+    display: block;
+    content: '💯';
+  }
+`;
+
+const Title = styled.div`
   font-size: 2rem;
-  font-family: monospace;
-  color: ${props => props.theme.red};
+  text-transform: uppercase;
 `;
 
-const Item = ({ title, description, id, price, image }) => (
+const Item = ({ title, description, id, price, image, handleDelete }) => (
   <ItemContainer>
-    {image && <Thumbnail src={image} alt="" />}
     <Link href="item/[id]" as={`item/${id}`} passHref>
-      <Title>{title}</Title>
+      <a>
+        {image && <Thumbnail src={image} alt="" />}
+        {!image && <FakeThumbnail />}
+        <Title>{title}</Title>
+      </a>
     </Link>
 
     <p>{description}</p>
 
-    <strong>Za jedyne: {formatMoney(price)}</strong>
+    <strong>For only: {formatMoney(price)}❗</strong>
+
+    {handleDelete && (
+      <button type="button" onClick={handleDelete}>
+        Delete ❌
+      </button>
+    )}
   </ItemContainer>
 );
 
