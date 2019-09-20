@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { gql } from 'apollo-boost';
 import styled from 'styled-components';
 import Item from '../components/Item';
 
@@ -10,7 +10,7 @@ const ItemsContainer = styled.div`
   grid-gap: 20px;
 `;
 
-const ALL_ITEMS_QUERY = gql`
+export const ALL_ITEMS_QUERY = gql`
   query ALL_ITEMS_QUERY {
     items {
       id

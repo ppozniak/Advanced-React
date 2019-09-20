@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import gql from 'graphql-tag';
+import React from 'react';
+import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
-import Form from '../components/styles/Form';
+import { Form, Field, useForm } from '../components/Form';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -25,31 +25,6 @@ const CREATE_ITEM_MUTATION = gql`
     }
   }
 `;
-
-const useForm = (defaultState = {}) => {
-  const [inputs, setInputs] = useState(defaultState);
-
-  const handleChange = ({ target: { name, value, type, files } }) => {
-    let formattedValue = value;
-
-    if (type === 'file') {
-      [formattedValue] = files;
-    } else if (type === 'number') {
-      formattedValue = parseFloat(value);
-    }
-
-    setInputs({ ...inputs, [name]: formattedValue });
-  };
-
-  return { inputs, handleChange, setInputs };
-};
-
-const Field = ({ name, type = 'text', onChange = () => {}, value }) => (
-  <label htmlFor={name}>
-    {name.toUpperCase()}
-    <input onChange={onChange} type={type} id={name} name={name} value={value} />
-  </label>
-);
 
 const Sell = () => {
   const { inputs, setInputs, handleChange } = useForm({
