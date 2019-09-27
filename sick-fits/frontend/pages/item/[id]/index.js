@@ -4,6 +4,7 @@ import { gql } from 'apollo-boost';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Link from 'next/link';
+import Head from 'next/head';
 import formatMoney from '../../../lib/formatMoney';
 import { ALL_ITEMS_QUERY } from '../../index';
 
@@ -83,6 +84,9 @@ const Item = () => {
   const { title, image, largeImage, description, price } = data.item;
   return (
     <div>
+      <Head>
+        <title>{title} | Ink Link</title>
+      </Head>
       {largeImage && (
         <CoverPhoto src={largeImage}>{image && <Thumbnail src={image} alt="" />}</CoverPhoto>
       )}

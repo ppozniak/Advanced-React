@@ -64,6 +64,7 @@ const Sell = () => {
     }
 
     await createItem();
+    // @TODO: Clear also the image
     setInputs({
       title: '',
       description: '',
@@ -79,9 +80,9 @@ const Sell = () => {
     <Form autoComplete="off" onSubmit={event => handleSubmit(event, createItem)}>
       <h2>Add new item</h2>
       <fieldset disabled={loading} aria-busy={loading}>
-        <Field value={title} onChange={handleChange} name="title" />
-        <Field value={description} onChange={handleChange} name="description" />
-        <Field value={price} onChange={handleChange} name="price" type="number" />
+        <Field value={title} onChange={handleChange} name="title" required />
+        <Field value={description} onChange={handleChange} name="description" required />
+        <Field value={price} onChange={handleChange} name="price" type="number" required />
         <Field onChange={handleChange} name="image" type="file" />
 
         {newItemId && (

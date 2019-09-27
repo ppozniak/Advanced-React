@@ -1,10 +1,25 @@
 import styled, { keyframes } from 'styled-components';
 import { useState } from 'react';
 
-export const Field = ({ name, type = 'text', onChange = () => {}, value, ...rest }) => (
+export const Field = ({
+  name,
+  type = 'text',
+  onChange = () => {},
+  value,
+  required = false,
+  ...rest
+}) => (
   <label htmlFor={name}>
     {name.toUpperCase()}
-    <input onChange={onChange} type={type} id={name} name={name} value={value} {...rest} />
+    <input
+      onChange={onChange}
+      type={type}
+      id={name}
+      name={name}
+      value={value}
+      required={required}
+      {...rest}
+    />
   </label>
 );
 
@@ -16,7 +31,7 @@ export const useForm = (defaultState = {}) => {
 
     if (type === 'file') {
       [formattedValue] = files;
-    } else if (type === 'number') {
+    } else if (type === 'number' && value) {
       formattedValue = parseFloat(value);
     }
 
