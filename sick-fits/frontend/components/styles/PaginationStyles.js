@@ -21,6 +21,8 @@ const PaginationStyles = styled.div`
   a[aria-disabled='true'] {
     color: grey;
     pointer-events: none;
+    text-decoration: none;
+    opacity: 0.5;
   }
 `;
 
