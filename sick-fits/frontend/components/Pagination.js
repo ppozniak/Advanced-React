@@ -1,12 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
+import PropTypes from 'prop-types';
 import PaginationStyles from './styles/PaginationStyles';
 
-const Pagination = ({ currentPage, totalItems, lastCursor, firstCursor, itemsPerPage }) => {
-  const pages = Math.ceil(totalItems / itemsPerPage);
-
-  const showPrev = currentPage > 1;
-  const showNext = currentPage < pages;
+const Pagination = ({ currentPage, totalItems, totalPages }) => {
+  const isNextDisabled = currentPage === totalPages;
 
   return (
     <PaginationStyles>
@@ -14,16 +12,15 @@ const Pagination = ({ currentPage, totalItems, lastCursor, firstCursor, itemsPer
         href={{
           pathname: '/',
           query: {
-            before: firstCursor,
             page: currentPage - 1,
           },
         }}
       >
-        <a aria-disabled={!showPrev}>Prev</a>
+        <a aria-disabled={currentPage <= 1}>Prev</a>
       </Link>
 
       <div>
-        Current page: {currentPage} of {pages}
+        Current page: {currentPage} of {totalPages}
       </div>
       <div>Total items: {totalItems}</div>
 
@@ -31,15 +28,20 @@ const Pagination = ({ currentPage, totalItems, lastCursor, firstCursor, itemsPer
         href={{
           pathname: '/',
           query: {
-            after: lastCursor,
             page: currentPage + 1,
           },
         }}
       >
-        <a aria-disabled={!showNext}>Next</a>
+        <a aria-disabled={isNextDisabled}>Next</a>
       </Link>
     </PaginationStyles>
   );
+};
+
+Pagination.propTypes = {
+  currentPage: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  totalItems: PropTypes.number.isRequired,
 };
 
 export default Pagination;
