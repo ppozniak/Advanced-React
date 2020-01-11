@@ -12,6 +12,7 @@ type Mutation {
   createItem(data: ItemCreateInput!): Item!
   updateItem(data: ItemUpdateInput!, where: ItemWhereUniqueInput!): Item!
   deleteItem(where: ItemWhereUniqueInput!): Item!
+  signUp(email: String!, name: String!, password: String!): User!
 }
 
 type Query {
