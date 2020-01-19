@@ -10,14 +10,6 @@ const Mutations = {
   createItem: forwardTo('db'),
   updateItem: forwardTo('db'),
   deleteItem: forwardTo('db'),
-  // async createItem(parent, args, ctx, info) {
-  //   console.log(args);
-  //   const item = await ctx.db.mutation.createItem({ data: args.data });
-
-  //   console.log(item);
-
-  //   return item;
-  // }
   signUp: async (parent, args, ctx, info) => { 
     const email = args.email.toLowerCase();
     const password = await bcrypt.hash(args.password, SALT_LENGTH);
