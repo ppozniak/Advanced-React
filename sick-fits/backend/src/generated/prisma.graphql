@@ -1,5 +1,5 @@
 # source: https://eu1.prisma.sh/ppozniak95/siccc-fits/dev
-# timestamp: Sat Jan 11 2020 21:56:56 GMT+0000 (Greenwich Mean Time)
+# timestamp: Thu Jan 23 2020 21:04:11 GMT+0000 (Greenwich Mean Time)
 
 type AggregateItem {
   count: Int!
@@ -503,7 +503,7 @@ type User implements Node {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: [Permission!]!
+  permissions: [Permission!]!
 }
 
 """A connection to a list of items."""
@@ -523,10 +523,10 @@ input UserCreateInput {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: UserCreatepermissionInput
+  permissions: UserCreatepermissionsInput
 }
 
-input UserCreatepermissionInput {
+input UserCreatepermissionsInput {
   set: [Permission!]
 }
 
@@ -561,7 +561,7 @@ type UserPreviousValues {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permission: [Permission!]!
+  permissions: [Permission!]!
 }
 
 type UserSubscriptionPayload {
@@ -607,7 +607,7 @@ input UserUpdateInput {
   password: String
   resetToken: String
   resetTokenExpiry: Float
-  permission: UserUpdatepermissionInput
+  permissions: UserUpdatepermissionsInput
 }
 
 input UserUpdateManyMutationInput {
@@ -616,10 +616,10 @@ input UserUpdateManyMutationInput {
   password: String
   resetToken: String
   resetTokenExpiry: Float
-  permission: UserUpdatepermissionInput
+  permissions: UserUpdatepermissionsInput
 }
 
-input UserUpdatepermissionInput {
+input UserUpdatepermissionsInput {
   set: [Permission!]
 }
 

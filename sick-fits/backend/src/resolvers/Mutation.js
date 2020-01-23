@@ -14,7 +14,7 @@ const Mutations = {
     const email = args.email.toLowerCase();
     const password = await bcrypt.hash(args.password, SALT_LENGTH);
 
-    const user = await ctx.db.mutation.createUser({ data: { ...args, email, password, permission: { set: ['USER'] } } }, info);
+    const user = await ctx.db.mutation.createUser({ data: { ...args, email, password, permissions: { set: ['USER'] } } }, info);
 
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
     ctx.response.cookie('token', token, {
