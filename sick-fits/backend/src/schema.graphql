@@ -8,11 +8,16 @@ input ItemCreateInput {
   largeImage: String
 }
 
+type SuccessMessage {
+  message: String
+}
+
 type Mutation {
   createItem(data: ItemCreateInput!): Item!
   updateItem(data: ItemUpdateInput!, where: ItemWhereUniqueInput!): Item!
   deleteItem(where: ItemWhereUniqueInput!): Item!
   signUp(email: String!, name: String!, password: String!): User!
+  signIn(email: String!, password: String!): SuccessMessage
 }
 
 type Query {

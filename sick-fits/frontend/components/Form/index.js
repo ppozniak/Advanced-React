@@ -9,12 +9,12 @@ export const Field = ({
   required = false,
   ...rest
 }) => (
-  <label htmlFor={name}>
+  // eslint-disable-next-line jsx-a11y/label-has-associated-control
+  <label>
     {name.toUpperCase()}
     <input
       onChange={onChange}
       type={type}
-      id={name}
       name={name}
       value={value}
       required={required}

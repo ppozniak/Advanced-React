@@ -14,15 +14,43 @@ const Mutations = {
     const email = args.email.toLowerCase();
     const password = await bcrypt.hash(args.password, SALT_LENGTH);
 
-    const user = await ctx.db.mutation.createUser({ data: { ...args, email, password, permissions: { set: ['USER'] } } }, info);
-
-    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
-    ctx.response.cookie('token', token, {
-      maxAge: DAY,
-      httpOnly: true
-    })
+    try {
+      const user = await ctx.db.mutation.createUser({ data: { ...args, email, password, permissions: { set: ['USER'] } } }, info); 
+      const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
+      ctx.response.cookie('token', token, {
+        maxAge: DAY,
+        httpOnly: true
+      })
 
     return user;
+    } catch (error) {
+      if (error.message.includes('unique') && error.message.includes('email')) {
+        throw new Error('This email is already taken.');
+      }
+      throw error;
+    }
+
+  },
+  signIn: async (parent, { email, password }, ctx, info) => {
+    const user = await ctx.db.query.user({ where: { email } });
+
+    if (!user) {
+      throw new Error('User does not exist.')
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if(!isPasswordValid) {
+      throw new Error('Invalid password!');
+    }
+
+     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
+     ctx.response.cookie("token", token, {
+       maxAge: DAY,
+       httpOnly: true
+     });
+
+    return {  message: 'You are now logged in!'}
   }
 };
 

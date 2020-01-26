@@ -26,7 +26,7 @@ const CREATE_ITEM_MUTATION = gql`
   }
 `;
 
-const Sell = () => {
+const SellPage = () => {
   const { inputs, setInputs, handleChange } = useForm({
     title: '',
     description: '',
@@ -104,4 +104,4 @@ const Sell = () => {
   );
 };
 
-export default Sell;
+export default SellPage;
