@@ -51,6 +51,10 @@ const Mutations = {
      });
 
     return {  message: 'You are now logged in!'}
+  },
+  signOut(parent, args, ctx, info) {
+    ctx.response.clearCookie('token');
+    return { message: 'Goodbye!' };
   }
 };
 
