@@ -7,11 +7,12 @@ export const Field = ({
   onChange = () => {},
   value,
   required = false,
+  label = '',
   ...rest
 }) => (
   // eslint-disable-next-line jsx-a11y/label-has-associated-control
   <label>
-    {name.toUpperCase()}
+    {label.toUpperCase() || name.toUpperCase()}
     <input
       onChange={onChange}
       type={type}

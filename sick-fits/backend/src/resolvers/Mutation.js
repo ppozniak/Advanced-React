@@ -100,6 +100,8 @@ const Mutations = {
     const user = await ctx.db.query.user({ where: {
       email,
     } });
+
+    if(!user) throw new Error('User does not exist');
  
     if (!user.resetToken || !user.resetTokenExpiry || resetToken !== user.resetToken) throw new Error('Invalid token');
 

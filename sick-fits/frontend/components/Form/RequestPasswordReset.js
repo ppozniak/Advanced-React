@@ -4,8 +4,8 @@ import { useMutation } from '@apollo/react-hooks';
 import { Form, Field, useForm } from '.';
 import ErrorMessage from '../ErrorMessage';
 
-const REQUEST_PASSWORD_RESET_QUERY = gql`
-  mutation REQUEST_PASSWORD_RESET_QUERY($email: String!) {
+const REQUEST_PASSWORD_RESET_MUTATION = gql`
+  mutation REQUEST_PASSWORD_RESET_MUTATION($email: String!) {
     requestPasswordReset(email: $email) {
       message
     }
@@ -24,7 +24,7 @@ const RequestPasswordRequest = () => {
   const [
     requestPasswordReset,
     { data: { requestPasswordReset: { message } = {} } = {}, error, loading },
-  ] = useMutation(REQUEST_PASSWORD_RESET_QUERY, {
+  ] = useMutation(REQUEST_PASSWORD_RESET_MUTATION, {
     variables: inputs,
   });
 
