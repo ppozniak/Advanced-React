@@ -1,9 +1,16 @@
 import React from 'react';
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
+import Link from 'next/link';
+import styled from 'styled-components';
 import { Form, Field, useForm } from '.';
 import { CURRENT_USER_QUERY } from '../CurrentUser';
 import ErrorMessage from '../ErrorMessage';
+
+const ForgotPasswordLinkContainer = styled.div`
+  margin-top: 2rem;
+  font-size: 1rem;
+`;
 
 const SIGN_IN_MUTATION = gql`
   mutation SIGN_IN_MUTATION($email: String!, $password: String!) {
@@ -70,6 +77,12 @@ const SignIn = () => {
         {message && <div>{message}</div>}
 
         <button type="submit">Sign in</button>
+
+        <ForgotPasswordLinkContainer>
+          <Link href="reset-password">
+            <a>Forgot password?</a>
+          </Link>
+        </ForgotPasswordLinkContainer>
       </fieldset>
     </Form>
   );
