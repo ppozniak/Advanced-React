@@ -2,6 +2,7 @@ const { forwardTo } = require("prisma-binding");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const { transport, createEmailTemplate } = require("../services/mail");
 
 const SALT_LENGTH = 10;
 const RESET_TOKEN_LENGTH = 20;
@@ -87,10 +88,27 @@ const Mutations = {
       }
     });
 
-    return { message: 'You should get an email soon, read it and follow the instructions inside.' }
 
     // 4. Send an email
-    // @TODO
+    const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password?resetToken=${resetToken}&email=${email}`
+    await transport.sendMail({
+      from: 'inklink@noreply',
+      to: email,
+      subject: 'Password reset request.',
+      html: createEmailTemplate({
+        title: 'Hello there!',
+        body: `
+          It seems like you requested a new password.
+          If that was you all you have to do is to click this link and set up a new password :)
+          <p>
+            <a href="${resetPasswordUrl}" target="_blank" rel="noopener">Reset your password</a>
+          </p>
+        `
+      })
+    })
+
+    // 5. Return message
+    return { message: 'You should get an email soon, read it and follow the instructions inside.' }
   },
 
   resetPassword: async(parent, { email, password, confirmPassword, resetToken }, ctx, info) => {
