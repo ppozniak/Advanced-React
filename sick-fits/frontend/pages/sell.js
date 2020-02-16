@@ -3,6 +3,7 @@ import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
 import { Form, Field, useForm } from '../components/Form';
+import ErrorMessage from '../components/ErrorMessage';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -96,7 +97,7 @@ const SellPage = () => {
             </p>
           </div>
         )}
-        {error && <div>{error.message}</div>}
+        {error && <ErrorMessage error={error} />}
 
         <button type="submit">Submit</button>
       </fieldset>

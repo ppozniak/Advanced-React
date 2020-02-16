@@ -18,7 +18,25 @@ function appendJWT(response, userId) {
 }
 
 const Mutations = {
-  createItem: forwardTo("db"),
+  createItem: async (parent, args, ctx, info) => {
+
+    if(!ctx.request.userId) {
+      throw new Error('You must be logged in to do that.');
+    }
+
+    const item = await ctx.db.mutation.createItem({
+      data: {
+        ...args.data,
+        user: {
+          connect: {
+            id: ctx.request.userId
+          }
+        },
+      }
+    }, info)
+    
+    return item;
+  },
   updateItem: forwardTo("db"),
   deleteItem: forwardTo("db"),
   signUp: async (parent, args, ctx, info) => {
