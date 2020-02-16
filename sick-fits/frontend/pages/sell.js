@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
 import { Form, Field, useForm } from '../components/Form';
 import ErrorMessage from '../components/ErrorMessage';
+import LogInGuard from '../components/LogInGuard';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -78,30 +79,32 @@ const SellPage = () => {
   const { title, description, price } = inputs;
 
   return (
-    <Form autoComplete="off" onSubmit={event => handleSubmit(event, createItem)}>
-      <h2>Add new item</h2>
-      <fieldset disabled={loading} aria-busy={loading}>
-        <Field value={title} onChange={handleChange} name="title" required />
-        <Field value={description} onChange={handleChange} name="description" required />
-        <Field value={price} onChange={handleChange} name="price" type="number" required />
-        <Field onChange={handleChange} name="image" type="file" />
+    <LogInGuard>
+      <Form autoComplete="off" onSubmit={event => handleSubmit(event, createItem)}>
+        <h2>Add new item</h2>
+        <fieldset disabled={loading} aria-busy={loading}>
+          <Field value={title} onChange={handleChange} name="title" required />
+          <Field value={description} onChange={handleChange} name="description" required />
+          <Field value={price} onChange={handleChange} name="price" type="number" required />
+          <Field onChange={handleChange} name="image" type="file" />
 
-        {newItemId && (
-          <div>
-            <p>New item {newItemId} successfully created!</p>
-            <p>
-              View it{' '}
-              <Link href="/item/[id]" as={`/item/${newItemId}`}>
-                <a>here</a>
-              </Link>
-            </p>
-          </div>
-        )}
-        {error && <ErrorMessage error={error} />}
+          {newItemId && (
+            <div>
+              <p>New item {newItemId} successfully created!</p>
+              <p>
+                View it{' '}
+                <Link href="/item/[id]" as={`/item/${newItemId}`}>
+                  <a>here</a>
+                </Link>
+              </p>
+            </div>
+          )}
+          {error && <ErrorMessage error={error} />}
 
-        <button type="submit">Submit</button>
-      </fieldset>
-    </Form>
+          <button type="submit">Submit</button>
+        </fieldset>
+      </Form>
+    </LogInGuard>
   );
 };
 
