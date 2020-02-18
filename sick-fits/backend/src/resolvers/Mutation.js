@@ -38,7 +38,9 @@ const Mutations = {
 
     return item;
   },
+  // @TODO: Sanity check if user is logged in && is the creator
   updateItem: forwardTo("db"),
+  // @TODO: Sanity check if user is logged in && is the creator
   deleteItem: forwardTo("db"),
   signUp: async (parent, args, ctx, info) => {
     const email = args.email.toLowerCase();

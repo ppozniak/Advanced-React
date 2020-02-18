@@ -18,6 +18,9 @@ export const ITEM_QUERY = gql`
       price
       image
       largeImage
+      user {
+        id
+      }
     }
   }
 `;
@@ -48,7 +51,7 @@ const Item = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { currentUser } = useCurrentUser();
+  const { isUserAdmin, isUserCreatorOfItem } = useCurrentUser();
 
   const { loading, error, data } = useQuery(ITEM_QUERY, {
     variables: { id },
@@ -98,7 +101,7 @@ const Item = () => {
       <p>{description}</p>
       <p>Price: {formatMoney(price)}</p>
 
-      {!!currentUser && (
+      {(isUserAdmin || isUserCreatorOfItem(data.item)) && (
         <>
           <div>
             <Link href="/item/[id]/update" as={`/item/${id}/update`}>

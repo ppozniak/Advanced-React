@@ -22,7 +22,7 @@ const SuccessMessage = styled.div`
 `;
 
 // @TODO: Check how to fetch that from server
-const PERMISSION_TYPES = {
+export const PERMISSION_TYPES = {
   USER: 'USER',
   ADMIN: 'ADMIN',
   ITEM_CREATE: 'ITEM_CREATE',

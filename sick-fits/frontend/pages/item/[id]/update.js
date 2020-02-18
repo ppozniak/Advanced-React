@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { ITEM_QUERY } from './index';
 import { Form, Field, useForm } from '../../../components/Form';
 import LogInGuard from '../../../components/LogInGuard';
+import useCurrentUser from '../../../components/useCurrentUser';
 
 const UPDATE_ITEM_MUTATION = gql`
   mutation UPDATE_ITEM_MUTATION(
@@ -58,6 +59,8 @@ const Update = () => {
   );
   // @TODO: Update cache
 
+  const { isUserAdmin, isUserCreatorOfItem } = useCurrentUser();
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error {error.message}</div>;
 
@@ -77,26 +80,33 @@ const Update = () => {
 
   return (
     <LogInGuard>
-      <Form autoComplete="off" onSubmit={event => handleSubmit(event, updateItem)}>
-        <h2>Update item</h2>
-        <h3>Item ID: {data.item.id}</h3>
-        <fieldset disabled={updating} aria-busy={updating}>
-          <Field onChange={handleChange} name="title" defaultValue={data.item.title} />
-          <Field onChange={handleChange} name="description" defaultValue={data.item.description} />
-          <Field
-            onChange={handleChange}
-            name="price"
-            type="number"
-            defaultValue={data.item.price}
-          />
+      {((isUserAdmin || isUserCreatorOfItem(data.item)) && (
+        <Form autoComplete="off" onSubmit={event => handleSubmit(event, updateItem)}>
+          <h2>Update item</h2>
+          <h3>Item ID: {data.item.id}</h3>
+          <fieldset disabled={updating} aria-busy={updating}>
+            <Field onChange={handleChange} name="title" defaultValue={data.item.title} />
+            <Field
+              onChange={handleChange}
+              name="description"
+              defaultValue={data.item.description}
+            />
+            <Field
+              onChange={handleChange}
+              name="price"
+              type="number"
+              defaultValue={data.item.price}
+            />
 
-          {/* @TODO: deal with image later */}
-          {/* <Field onChange={handleChange} name="image" type="file" /> */}
-          {updateError && <div>{updateError.message}</div>}
+            {/* @TODO: deal with image later */}
+            {/* <Field onChange={handleChange} name="image" type="file" /> */}
+            {updateError && <div>{updateError.message}</div>}
 
-          <button type="submit">Submit</button>
-        </fieldset>
-      </Form>
+            <button type="submit">Submit</button>
+          </fieldset>
+        </Form>
+      )) ||
+        'You have no rights to update this item.'}
     </LogInGuard>
   );
 };
