@@ -1,4 +1,4 @@
-function hasPermission(user, permissionsNeeded) {
+function permissionsGuardian(user, permissionsNeeded) {
   const matchedPermissions = user.permissions.filter(permissionTheyHave =>
     permissionsNeeded.includes(permissionTheyHave)
   );
@@ -14,4 +14,13 @@ function hasPermission(user, permissionsNeeded) {
   }
 }
 
-exports.hasPermission = hasPermission;
+function loggedInGuardian(ctx) {
+  if(!ctx.request.userId) {
+    throw new Error('You must be logged in to do that.');
+  }
+}
+
+module.exports = {
+  permissionsGuardian,
+  loggedInGuardian,
+};

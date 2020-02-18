@@ -1,8 +1,9 @@
-const { forwardTo } = require("prisma-binding");
+const { forwardTo } = require('prisma-binding');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { transport, createEmailTemplate } = require("../services/mail");
+const { transport, createEmailTemplate } = require('../services/mail');
+const { loggedInGuardian } = require('../utils');
 
 const SALT_LENGTH = 10;
 const RESET_TOKEN_LENGTH = 20;
@@ -20,9 +21,7 @@ function appendJWT(response, userId) {
 const Mutations = {
   createItem: async (parent, args, ctx, info) => {
 
-    if(!ctx.request.userId) {
-      throw new Error('You must be logged in to do that.');
-    }
+    loggedInGuardian(ctx);
 
     const item = await ctx.db.mutation.createItem({
       data: {

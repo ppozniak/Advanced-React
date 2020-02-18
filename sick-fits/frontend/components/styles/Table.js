@@ -26,6 +26,16 @@ const Table = styled.table`
       background: ${props => props.theme.offWhite};
     }
   }
+
+  caption {
+    font-size: 2rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border: 1px solid ${props => props.theme.offWhite};
+    border-bottom: none;
+  }
 `;
 
 export default Table;

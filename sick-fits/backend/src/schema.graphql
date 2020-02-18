@@ -33,6 +33,7 @@ type Query {
   itemsConnection: ItemConnection!
   item(where: ItemWhereUniqueInput!, first: Int, skip: Int, last: Int): Item
   currentUser: User
+  users: [User]!
 }
 
 type User {
