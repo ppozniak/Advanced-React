@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import styled from 'styled-components';
 import ErrorMessage from '../../components/ErrorMessage';
 import LogInGuard from '../../components/LogInGuard';
@@ -12,6 +12,13 @@ const PermissionClickArea = styled.label`
   width: 100%;
   height: 100%;
   padding: 1rem 0;
+`;
+
+const SuccessMessage = styled.div`
+  font-size: 0.95rem;
+  color: ${props => props.theme.green};
+  font-weight: bold;
+  text-transform: uppercase;
 `;
 
 // @TODO: Check how to fetch that from server
@@ -37,8 +44,18 @@ const USERS_QUERY = gql`
   }
 `;
 
-const UserPermissionsRow = ({ user: { name, email, permissions } }) => {
+const UPDATE_PERMISSIONS_MUTATION = gql`
+  mutation UPDATE_PERMISSIONS_MUTATION($userId: ID!, $permissions: [Permission]!) {
+    updatePermissions(userId: $userId, permissions: $permissions) {
+      permissions
+      id
+    }
+  }
+`;
+
+const UserPermissionsRow = ({ user: { name, email, permissions, id } }) => {
   const [userPermissions, setPermissions] = useState(permissions);
+  const [disabled, setDisabled] = useState(true);
 
   const handleChange = ({ target: { value, checked } }) => {
     if (checked) {
@@ -46,6 +63,19 @@ const UserPermissionsRow = ({ user: { name, email, permissions } }) => {
     } else {
       setPermissions(userPermissions => userPermissions.filter(permission => permission !== value));
     }
+    setDisabled(false);
+  };
+
+  const [updatePermissions, { loading, error, called }] = useMutation(UPDATE_PERMISSIONS_MUTATION, {
+    variables: {
+      userId: id,
+      permissions: userPermissions,
+    },
+  });
+
+  const handleSubmit = async () => {
+    await updatePermissions();
+    setDisabled(true);
   };
 
   return (
@@ -65,7 +95,11 @@ const UserPermissionsRow = ({ user: { name, email, permissions } }) => {
         </td>
       ))}
       <td>
-        <button type="button">Update</button>
+        <button onClick={handleSubmit} disabled={loading || disabled} type="button">
+          {loading ? 'Updating' : 'Update'}
+        </button>
+        <ErrorMessage error={error} />
+        {called && !error && disabled && <SuccessMessage>Successfully updated</SuccessMessage>}
       </td>
     </tr>
   );

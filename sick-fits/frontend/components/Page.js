@@ -12,6 +12,7 @@ const theme = {
   maxWidth: '1000px',
   bs: '0 12px 24px 0 rgba(0, 0, 0, 0.09)',
   blue: '#0096ff',
+  green: '#00b376',
 };
 
 const StyledPage = styled.div`

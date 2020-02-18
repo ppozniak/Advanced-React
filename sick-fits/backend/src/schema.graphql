@@ -26,6 +26,7 @@ type Mutation {
     password: String!
     confirmPassword: String!
   ): User
+  updatePermissions(userId: ID!, permissions: [Permission]!): User
 }
 
 type Query {
