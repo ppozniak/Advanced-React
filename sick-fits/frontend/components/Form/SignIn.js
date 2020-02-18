@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { Form, Field, useForm } from '.';
-import { CURRENT_USER_QUERY } from '../CurrentUser';
+import { CURRENT_USER_QUERY } from '../useCurrentUser';
 import ErrorMessage from '../ErrorMessage';
 
 const ForgotPasswordLinkContainer = styled.div`

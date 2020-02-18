@@ -1,6 +1,6 @@
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
-import { CURRENT_USER_QUERY } from './CurrentUser';
+import { CURRENT_USER_QUERY } from './useCurrentUser';
 
 export const SIGN_OUT_MUTATION = gql`
   mutation {

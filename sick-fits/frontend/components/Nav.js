@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import NavStyles from './styles/NavStyles';
 import SignOut from './SignOut';
-import useCurrentUser from './CurrentUser';
+import useCurrentUser from './useCurrentUser';
 
 const Nav = () => {
   const { currentUser } = useCurrentUser();
