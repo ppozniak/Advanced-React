@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import formatMoney from '../../../lib/formatMoney';
 import { ALL_ITEMS_QUERY } from '../../index';
+import useCurrentUser from '../../../components/CurrentUser';
 
 export const ITEM_QUERY = gql`
   query ITEM_QUERY($id: ID!) {
@@ -46,6 +47,8 @@ align-items: flex-end;
 const Item = () => {
   const router = useRouter();
   const { id } = router.query;
+
+  const { currentUser } = useCurrentUser();
 
   const { loading, error, data } = useQuery(ITEM_QUERY, {
     variables: { id },
@@ -95,22 +98,28 @@ const Item = () => {
       <p>{description}</p>
       <p>Price: {formatMoney(price)}</p>
 
-      <div>
-        <Link href="/item/[id]/update" as={`/item/${id}/update`}>
-          <a>Update</a>
-        </Link>
-      </div>
+      {!!currentUser && (
+        <>
+          <div>
+            <Link href="/item/[id]/update" as={`/item/${id}/update`}>
+              <a>Update</a>
+            </Link>
+          </div>
 
-      <button
-        type="button"
-        onClick={() => window.confirm('Are you sure you want to delete that item?') && deleteItem()}
-      >
-        <div>
-          {deleting && 'Deleting...'}
-          {deletingError && 'Could not delete that item. Try again'}
-          {!deleting && !deletingError && 'Delete item. ❌'}
-        </div>
-      </button>
+          <button
+            type="button"
+            onClick={() =>
+              window.confirm('Are you sure you want to delete that item?') && deleteItem()
+            }
+          >
+            <div>
+              {deleting && 'Deleting...'}
+              {deletingError && 'Could not delete that item. Try again'}
+              {!deleting && !deletingError && 'Delete item. ❌'}
+            </div>
+          </button>
+        </>
+      )}
     </div>
   );
 };

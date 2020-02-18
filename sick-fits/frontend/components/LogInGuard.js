@@ -1,14 +1,13 @@
 import React from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { CURRENT_USER_QUERY } from './CurrentUser';
+import useCurrentUser from './CurrentUser';
 import SignIn from './Form/SignIn';
 
 const LogInGuard = ({ children }) => {
-  const { data, loading, error } = useQuery(CURRENT_USER_QUERY);
+  const { currentUser, loading, error } = useCurrentUser();
   if (loading) return 'Loading...';
   if (error) return 'Error';
 
-  if (data.currentUser) return children;
+  if (currentUser) return children;
 
   return (
     <div>

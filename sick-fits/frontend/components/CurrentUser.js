@@ -11,9 +11,13 @@ export const CURRENT_USER_QUERY = gql`
   }
 `;
 
-const CurrentUser = ({ children }) => {
-  const { data: { currentUser } = {} } = useQuery(CURRENT_USER_QUERY);
-  return children(currentUser);
+const useCurrentUser = () => {
+  const { data: { currentUser } = {}, loading, error } = useQuery(CURRENT_USER_QUERY);
+  return {
+    currentUser,
+    loading,
+    error,
+  };
 };
 
-export default CurrentUser;
+export default useCurrentUser;
