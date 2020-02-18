@@ -95,16 +95,21 @@ const Item = () => {
       <p>{description}</p>
       <p>Price: {formatMoney(price)}</p>
 
-      <Link href="/item/[id]/update" as={`/item/${id}/update`}>
-        <a>Update</a>
-      </Link>
+      <div>
+        <Link href="/item/[id]/update" as={`/item/${id}/update`}>
+          <a>Update</a>
+        </Link>
+      </div>
+
       <button
         type="button"
         onClick={() => window.confirm('Are you sure you want to delete that item?') && deleteItem()}
       >
-        {deleting && 'Deleting...'}
-        {deletingError && 'Could not delete that item. Try again'}
-        {!deleting && !deletingError && 'Delete item. ❌'}
+        <div>
+          {deleting && 'Deleting...'}
+          {deletingError && 'Could not delete that item. Try again'}
+          {!deleting && !deletingError && 'Delete item. ❌'}
+        </div>
       </button>
     </div>
   );

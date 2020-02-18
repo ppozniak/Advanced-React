@@ -39,22 +39,22 @@ const Home = () => {
   const { query } = useRouter();
   let currentPage = parseInt(query.page, 10) || 1;
 
-  if (currentPage < 0) {
-    currentPage = 1;
-  }
-
   const { data, loading, error } = useQuery(ALL_ITEMS_QUERY, {
     variables: {
       first: 3,
-      skip: currentPage * ITEMS_PER_PAGE,
+      skip: (currentPage - 1) * ITEMS_PER_PAGE,
     },
   });
 
   if (loading) return <i>Loading...</i>;
   if (error) return <strong>Error :(</strong>;
 
+  if (currentPage < 0) {
+    currentPage = 1;
+  }
+
   const totalItems = data.full.aggregate.count;
-  const totalPages = Math.floor(totalItems / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
   if (currentPage > totalPages) {
     currentPage = 1;
