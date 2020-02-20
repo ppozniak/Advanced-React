@@ -38,10 +38,41 @@ const Mutations = {
 
     return item;
   },
-  // @TODO: Sanity check if user is logged in && is the creator
-  updateItem: forwardTo("db"),
-  // @TODO: Sanity check if user is logged in && is the creator
-  deleteItem: forwardTo("db"),
+  // @TODO: Abstract updateItem and deleteItem to remove DRYness
+  updateItem: async (parent, args, ctx, info) => {
+    loggedInGuardian(ctx);
+   
+    const item = await ctx.db.query.item({ where: {
+      id: args.where.id
+    }}, '{ user { id } }');
+
+    const isUserCreator = ctx.request.user.id === item.user.id;
+    const userHasPermissions = ctx.request.user.permissions.some(permission => ['ADMIN', 'ITEM_UPDATE'].includes(permission));
+
+    if (isUserCreator || userHasPermissions) {
+      return ctx.db.mutation.updateItem(args, info);
+    } else {
+      throw new Error('You have no rights to update that item.');
+    }
+  },
+  deleteItem: async (parent, args, ctx, info) => {
+    loggedInGuardian(ctx);
+
+    const item = await ctx.db.query.item({ where: {
+      id: args.where.id
+    }}, '{ user { id } }');
+
+    const isUserCreator = ctx.request.user.id === item.user.id;
+    const userHasPermissions = ctx.request.user.permissions.some(permission =>
+      ["ADMIN", "ITEM_DELETE"].includes(permission)
+    );
+
+    if (isUserCreator || userHasPermissions) {
+      return ctx.db.mutation.deleteItem(args, info);
+    } else {
+      throw new Error("You have no rights to delete that item.");
+    }
+  },
   signUp: async (parent, args, ctx, info) => {
     const email = args.email.toLowerCase();
     const password = await bcrypt.hash(args.password, SALT_LENGTH);
