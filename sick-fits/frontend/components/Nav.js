@@ -1,10 +1,13 @@
 import Link from 'next/link';
+import { useMutation } from '@apollo/react-hooks';
 import NavStyles from './styles/NavStyles';
 import SignOut from './SignOut';
 import useCurrentUser from './useCurrentUser';
+import { TOGGLE_CART_MUTATION } from './Cart';
 
 const Nav = () => {
   const { currentUser } = useCurrentUser();
+  const [toggleCart] = useMutation(TOGGLE_CART_MUTATION);
   return (
     <NavStyles>
       <Link href="/">
@@ -38,6 +41,9 @@ const Nav = () => {
           </SignOut>
         </>
       )}
+      <button type="button" onClick={toggleCart}>
+        🛒
+      </button>
     </NavStyles>
   );
 };
