@@ -1,7 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { useMutation } from '@apollo/react-hooks';
 import formatMoney from '../lib/formatMoney';
+import { ADD_TO_CART_MUTATION, CART_QUERY } from './Cart';
 
 const ItemContainer = styled.div`
   padding: 1rem;
@@ -46,26 +48,44 @@ const Title = styled.div`
   text-transform: uppercase;
 `;
 
-const Item = ({ title, description, id, price, image, handleDelete }) => (
-  <ItemContainer>
-    <Link href="item/[id]" as={`item/${id}`} passHref>
-      <a>
-        {image && <Thumbnail src={image} alt="" />}
-        {!image && <FakeThumbnail />}
-        <Title>{title}</Title>
-      </a>
-    </Link>
+const Item = ({ title, description, id, price, image, handleDelete }) => {
+  const [addToCart, { loading: addingToCart }] = useMutation(ADD_TO_CART_MUTATION, {
+    variables: {
+      itemId: id,
+    },
+    refetchQueries: [
+      {
+        query: CART_QUERY,
+      },
+    ],
+  });
+  return (
+    <ItemContainer>
+      <Link href="item/[id]" as={`item/${id}`} passHref>
+        <a>
+          {image && <Thumbnail src={image} alt="" />}
+          {!image && <FakeThumbnail />}
+          <Title>{title}</Title>
+        </a>
+      </Link>
 
-    <p>{description}</p>
+      <p>{description}</p>
 
-    <strong>For only: {formatMoney(price)}❗</strong>
+      <strong>For only: {formatMoney(price)}❗</strong>
 
-    {handleDelete && (
-      <button type="button" onClick={handleDelete}>
-        Delete ❌
-      </button>
-    )}
-  </ItemContainer>
-);
+      <div>
+        <button type="button" onClick={addToCart} disabled={addingToCart}>
+          {addingToCart ? 'Adding...' : 'Add to cart'}
+        </button>
+
+        {handleDelete && (
+          <button type="button" onClick={handleDelete}>
+            Delete ❌
+          </button>
+        )}
+      </div>
+    </ItemContainer>
+  );
+};
 
 export default Item;
