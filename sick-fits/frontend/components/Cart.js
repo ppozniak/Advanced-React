@@ -19,6 +19,14 @@ export const ADD_TO_CART_MUTATION = gql`
   }
 `;
 
+export const REMOVE_FROM_CART_MUTATION = gql`
+  mutation REMOVE_FROM_CART_MUTATION($cartItemId: ID!) {
+    removeFromCart(cartItemId: $cartItemId) {
+      id
+    }
+  }
+`;
+
 export const CART_QUERY = gql`
   query CART_QUERY {
     currentUser {
@@ -48,12 +56,23 @@ export const TOGGLE_CART_MUTATION = gql`
   }
 `;
 
-const CartItem = ({ title, price, quantity }) => (
-  <li>
-    {title} - x{quantity} = {formatMoney(price * quantity)} ({formatMoney(price)} pu){' '}
-    <button type="button">🗑</button>
-  </li>
-);
+const CartItem = ({ title, price, quantity, id }) => {
+  const [removeFromCart, { loading: removingFromCart }] = useMutation(REMOVE_FROM_CART_MUTATION, {
+    variables: {
+      cartItemId: id,
+    },
+    refetchQueries: [{ query: CART_QUERY }],
+  });
+
+  return (
+    <li>
+      {title} - x{quantity} = {formatMoney(price * quantity)} ({formatMoney(price)} pu){' '}
+      <button type="button" onClick={removeFromCart} disabled={removingFromCart}>
+        {removingFromCart ? 'Removing...' : '🗑'}
+      </button>
+    </li>
+  );
+};
 
 const Cart = () => {
   const { data: { currentUser } = {}, loading, error } = useQuery(CART_QUERY);
@@ -82,7 +101,7 @@ const Cart = () => {
       <ul>
         {currentUser &&
           currentUser.cart.map(({ quantity, item: { title, price }, id }) => (
-            <CartItem quantity={quantity} title={title} key={id} price={price} />
+            <CartItem id={id} quantity={quantity} title={title} key={id} price={price} />
           ))}
       </ul>
 

@@ -276,6 +276,21 @@ const Mutations = {
       }, info);
     }
   },
+  async removeFromCart(parent, { cartItemId }, ctx, info) {
+    loggedInGuardian(ctx);
+
+    const cartItemToDelete = await ctx.db.query.cartItem({ where: {
+      id: cartItemId,
+    } }, `{ user { id } }`);
+
+    if (cartItemToDelete.user.id !== ctx.request.userId) {
+      throw new Error("You have no rights to delete that cart item.");
+    } 
+
+    return ctx.db.mutation.deleteCartItem({ where: {
+      id: cartItemId,
+    }}, info);
+  },
 };
 
 module.exports = Mutations;
