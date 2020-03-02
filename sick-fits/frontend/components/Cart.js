@@ -62,6 +62,22 @@ const CartItem = ({ title, price, quantity, id }) => {
       cartItemId: id,
     },
     refetchQueries: [{ query: CART_QUERY }],
+    optimisticResponse: {
+      __typename: 'MUTATION',
+      removeFromCart: {
+        __typename: 'CartItem',
+        id,
+      },
+    },
+    update: (cache, { data }) => {
+      const deletedCartItemId = data.removeFromCart.id;
+      const { currentUser } = cache.readQuery({ query: CART_QUERY });
+
+      const newCart = [...currentUser.cart].filter(cartItem => cartItem.id !== deletedCartItemId);
+      const newData = { currentUser: { ...currentUser, cart: newCart } };
+
+      cache.writeQuery({ query: CART_QUERY, data: newData });
+    },
   });
 
   return (
