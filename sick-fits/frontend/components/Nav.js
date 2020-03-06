@@ -1,13 +1,23 @@
 import Link from 'next/link';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import NavStyles from './styles/NavStyles';
 import SignOut from './SignOut';
 import useCurrentUser from './useCurrentUser';
-import { TOGGLE_CART_MUTATION } from './Cart';
+import { TOGGLE_CART_MUTATION, CartItemsQuantity, CART_QUERY } from './Cart';
 
 const Nav = () => {
   const { currentUser } = useCurrentUser();
   const [toggleCart] = useMutation(TOGGLE_CART_MUTATION);
+  const {
+    data: { currentUser: currentUserWithCart } = {},
+    loading: loadingCart,
+    networkStatus,
+  } = useQuery(CART_QUERY, {
+    notifyOnNetworkStatusChange: true,
+  });
+  const cart = (currentUserWithCart && currentUserWithCart.cart) || [];
+  const totalQuantity = cart.reduce((total, cartItem) => total + cartItem.quantity, 0);
+
   return (
     <NavStyles>
       <Link href="/">
@@ -43,6 +53,7 @@ const Nav = () => {
       )}
       <button type="button" onClick={toggleCart}>
         🛒
+        <CartItemsQuantity quantity={totalQuantity} loading={loadingCart || networkStatus === 1} />
       </button>
     </NavStyles>
   );

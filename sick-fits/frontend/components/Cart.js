@@ -1,6 +1,8 @@
 import React from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
+import styled from 'styled-components';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import CartStyles from './styles/CartStyles';
 import CloseButton from './styles/CloseButton';
 import Supreme from './styles/Supreme';
@@ -56,6 +58,93 @@ export const TOGGLE_CART_MUTATION = gql`
   }
 `;
 
+const Dot = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: ${props => props.theme.black};
+  color: white;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  text-decoration: none;
+  margin-bottom: -1.2rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const DotAnimation = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+
+  .dot-animation-enter {
+    transform: translateY(-20px);
+  }
+
+  .dot-animation-enter-active {
+    transform: translateY(0px);
+    transition: all 0.4s;
+  }
+
+  .dot-animation-exit {
+    transform: translateY(0px);
+  }
+
+  .dot-animation-exit-active {
+    transform: translateY(20px);
+    transition: all 0.4s;
+  }
+
+  span {
+    position: absolute;
+  }
+`;
+
+const DotLoading = styled.div`
+  @keyframes spin {
+    from {
+      transform: rotate(0turn);
+    }
+
+    to {
+      transform: rotate(1turn);
+    }
+  }
+  border-radius: 50%;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.5rem solid red;
+  border-top-width: 0;
+  border-left-width: 0;
+  animation: spin 1s infinite forwards linear;
+`;
+
+export const CartItemsQuantity = ({ quantity = 0, loading = false }) => (
+  <Dot>
+    {loading && <DotLoading />}
+    <DotAnimation>
+      <TransitionGroup component={null}>
+        <CSSTransition classNames="dot-animation" key={quantity} unmountOnExit timeout={400}>
+          <span>{quantity}</span>
+        </CSSTransition>
+      </TransitionGroup>
+    </DotAnimation>
+  </Dot>
+);
+
 const CartItem = ({ title, price, quantity, id }) => {
   const [removeFromCart, { loading: removingFromCart }] = useMutation(REMOVE_FROM_CART_MUTATION, {
     variables: {
@@ -80,9 +169,13 @@ const CartItem = ({ title, price, quantity, id }) => {
     },
   });
 
+  const itemCartString = `${title} - x${quantity} = ${formatMoney(price * quantity)} (${formatMoney(
+    price
+  )} pu)`;
+
   return (
     <li>
-      {title} - x{quantity} = {formatMoney(price * quantity)} ({formatMoney(price)} pu){' '}
+      {(title && quantity && itemCartString) || 'This item was deleted from our website.'}
       <button type="button" onClick={removeFromCart} disabled={removingFromCart}>
         {removingFromCart ? 'Removing...' : '🗑'}
       </button>
@@ -90,17 +183,26 @@ const CartItem = ({ title, price, quantity, id }) => {
   );
 };
 
+//  If item was deleted it will be null
+const onlyWithExistingItems = ({ item }) => !!item;
+
 const Cart = () => {
   const { data: { currentUser } = {}, loading, error } = useQuery(CART_QUERY);
   const { data: { cartOpen } = {} } = useQuery(LOCAL_STATE_QUERY);
   const [toggleCart] = useMutation(TOGGLE_CART_MUTATION);
 
-  const totalItems =
-    currentUser && currentUser.cart.reduce((total, item) => total + item.quantity, 0);
+  const cartItemsWithExistingItems =
+    (currentUser && currentUser.cart.filter(onlyWithExistingItems)) || [];
 
-  const totalPrice =
-    currentUser &&
-    currentUser.cart.reduce((total, { quantity, item }) => total + quantity * item.price, 0);
+  const totalItems = cartItemsWithExistingItems.reduce(
+    (total, cartItem) => total + cartItem.quantity,
+    0
+  );
+
+  const totalPrice = cartItemsWithExistingItems.reduce(
+    (total, { quantity, item }) => total + quantity * item.price,
+    0
+  );
 
   return (
     <CartStyles open={cartOpen}>
@@ -116,8 +218,14 @@ const Cart = () => {
       {error && <ErrorMessage error={error} />}
       <ul>
         {currentUser &&
-          currentUser.cart.map(({ quantity, item: { title, price }, id }) => (
-            <CartItem id={id} quantity={quantity} title={title} key={id} price={price} />
+          currentUser.cart.map(({ quantity, item, id }) => (
+            <CartItem
+              id={id}
+              key={id}
+              quantity={quantity}
+              title={item && item.title}
+              price={item && item.price}
+            />
           ))}
       </ul>
 

@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Form, Field, useForm } from '.';
 import { CURRENT_USER_QUERY } from '../useCurrentUser';
 import ErrorMessage from '../ErrorMessage';
+import { CART_QUERY } from '../Cart';
 
 const ForgotPasswordLinkContainer = styled.div`
   margin-top: 2rem;
@@ -37,6 +38,9 @@ const SignIn = () => {
       refetchQueries: [
         {
           query: CURRENT_USER_QUERY,
+        },
+        {
+          query: CART_QUERY,
         },
       ],
     }

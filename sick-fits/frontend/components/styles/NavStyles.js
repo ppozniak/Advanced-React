@@ -19,7 +19,7 @@ const NavStyles = styled.ul`
     border: 0;
     cursor: pointer;
     color: ${props => props.theme.blue};
-    text-decoration: underline;
+    text-decoration: none;
     font-weight: bold;
     font-family: inherit;
     @media (max-width: 700px) {

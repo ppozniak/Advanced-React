@@ -1,5 +1,5 @@
 # source: https://eu1.prisma.sh/ppozniak95/siccc-fits/dev
-# timestamp: Mon Feb 24 2020 21:34:53 GMT+0000 (Greenwich Mean Time)
+# timestamp: Fri Mar 06 2020 20:40:55 GMT+0000 (Greenwich Mean Time)
 
 type AggregateCartItem {
   count: Int!
@@ -20,7 +20,7 @@ type BatchPayload {
 
 type CartItem implements Node {
   id: ID!
-  item: Item!
+  item: Item
   user: User!
   quantity: Int
 }
@@ -38,7 +38,7 @@ type CartItemConnection {
 input CartItemCreateInput {
   id: ID
   quantity: Int
-  item: ItemCreateOneInput!
+  item: ItemCreateOneInput
   user: UserCreateOneWithoutCartInput!
 }
 
@@ -50,7 +50,7 @@ input CartItemCreateManyWithoutUserInput {
 input CartItemCreateWithoutUserInput {
   id: ID
   quantity: Int
-  item: ItemCreateOneInput!
+  item: ItemCreateOneInput
 }
 
 """An edge in a connection."""
@@ -186,7 +186,7 @@ input CartItemSubscriptionWhereInput {
 
 input CartItemUpdateInput {
   quantity: Int
-  item: ItemUpdateOneRequiredInput
+  item: ItemUpdateOneInput
   user: UserUpdateOneRequiredWithoutCartInput
 }
 
@@ -217,7 +217,7 @@ input CartItemUpdateManyWithWhereNestedInput {
 
 input CartItemUpdateWithoutUserDataInput {
   quantity: Int
-  item: ItemUpdateOneRequiredInput
+  item: ItemUpdateOneInput
 }
 
 input CartItemUpdateWithWhereUniqueWithoutUserInput {
@@ -451,9 +451,11 @@ input ItemUpdateManyMutationInput {
   largeImage: String
 }
 
-input ItemUpdateOneRequiredInput {
+input ItemUpdateOneInput {
   create: ItemCreateInput
   connect: ItemWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
   update: ItemUpdateDataInput
   upsert: ItemUpsertNestedInput
 }

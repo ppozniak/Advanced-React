@@ -8,6 +8,7 @@ import Head from 'next/head';
 import formatMoney from '../../../lib/formatMoney';
 import { ALL_ITEMS_QUERY } from '../../index';
 import useCurrentUser from '../../../components/useCurrentUser';
+import { CART_QUERY } from '../../../components/Cart';
 
 export const ITEM_QUERY = gql`
   query ITEM_QUERY($id: ID!) {
@@ -59,6 +60,7 @@ const Item = () => {
   const [deleteItem, { loading: deleting, error: deletingError }] = useMutation(
     DELETE_ITEM_MUTATION,
     {
+      refetchQueries: CART_QUERY,
       variables: { id },
       update: (
         cache,
