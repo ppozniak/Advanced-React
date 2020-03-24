@@ -29,6 +29,18 @@ function createClient() {
 
             return data;
           },
+          closeCart: (_, args, { cache }) => {
+            const data = {
+              cartOpen: false,
+            };
+
+            cache.writeQuery({
+              query: LOCAL_STATE_QUERY,
+              data,
+            });
+
+            return data;
+          },
         },
       },
     },

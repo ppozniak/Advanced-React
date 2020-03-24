@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { transport, createEmailTemplate } = require('../services/mail');
 const { loggedInGuardian, permissionsGuardian } = require("../utils");
+const { createPaymentIntent } = require('../services/stripe');
 
 const SALT_LENGTH = 10;
 const RESET_TOKEN_LENGTH = 20;
@@ -291,6 +292,29 @@ const Mutations = {
       id: cartItemId,
     }}, info);
   },
+  async checkout(parent, args, ctx, info) {
+    loggedInGuardian(ctx);
+
+    const { cart } = await ctx.db.query
+      .user(
+        {
+          where: {
+            id: ctx.request.userId
+          }
+        },
+        "{ cart { quantity, item { price } }}"
+      );
+
+      const totalCost = cart.reduce(
+        (total, cartItem) => total + cartItem.quantity * (cartItem.item.price * 100)
+      , 0);
+    
+      const intent = await createPaymentIntent({
+        amount: totalCost
+      });
+
+      return { clientSecret: intent['client_secret'] };
+  }
 };
 
 module.exports = Mutations;

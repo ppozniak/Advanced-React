@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import styled from 'styled-components';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
+import Link from 'next/link';
 import CartStyles from './styles/CartStyles';
 import CloseButton from './styles/CloseButton';
 import Supreme from './styles/Supreme';
@@ -55,6 +56,12 @@ export const LOCAL_STATE_QUERY = gql`
 export const TOGGLE_CART_MUTATION = gql`
   mutation TOGGLE_CART_MUTATION {
     toggleCart @client
+  }
+`;
+
+export const CLOSE_CART_MUTATION = gql`
+  mutation CLOSE_CART_MUTATION {
+    closeCart @client
   }
 `;
 
@@ -231,7 +238,9 @@ const Cart = () => {
 
       <footer>
         <p>{formatMoney(totalPrice)}</p>
-        <SickButton>Checkout</SickButton>
+        <Link href="/checkout" passHref>
+          <SickButton as="a">Checkout</SickButton>
+        </Link>
       </footer>
     </CartStyles>
   );

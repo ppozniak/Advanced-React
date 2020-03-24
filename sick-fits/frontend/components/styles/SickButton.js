@@ -12,6 +12,7 @@ const SickButton = styled.button`
   transform: skew(-2deg);
   display: inline-block;
   transition: all 0.5s;
+  text-decoration: none;
   &[disabled] {
     opacity: 0.5;
   }
