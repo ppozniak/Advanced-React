@@ -50,6 +50,7 @@ const Update = () => {
     {
       variables: {
         ...inputs,
+        price: parseFloat(inputs.price) * 100,
         id,
       },
       onCompleted: () => {
@@ -94,8 +95,9 @@ const Update = () => {
             <Field
               onChange={handleChange}
               name="price"
-              type="number"
-              defaultValue={data.item.price}
+              inputMode="decimal"
+              pattern="[0-9]+([\.,][0-9]+)?"
+              defaultValue={data.item.price / 100}
             />
 
             {/* @TODO: deal with image later */}

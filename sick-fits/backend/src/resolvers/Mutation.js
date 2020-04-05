@@ -306,7 +306,7 @@ const Mutations = {
       );
 
       const totalCost = cart.reduce(
-        (total, cartItem) => total + cartItem.quantity * (cartItem.item.price * 100)
+        (total, cartItem) => total + cartItem.quantity * cartItem.item.price
       , 0);
 
       const intent = await createPaymentIntent({

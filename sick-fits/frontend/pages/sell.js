@@ -41,7 +41,7 @@ const SellPage = () => {
     createItem,
     { data: { createItem: { id: newItemId } = {} } = {}, error, loading },
   ] = useMutation(CREATE_ITEM_MUTATION, {
-    variables: inputs,
+    variables: { ...inputs, price: parseFloat(inputs.price) * 100 },
   });
 
   // @TODO: Refactor this to be less error prone
@@ -85,7 +85,15 @@ const SellPage = () => {
         <fieldset disabled={loading} aria-busy={loading}>
           <Field value={title} onChange={handleChange} name="title" required />
           <Field value={description} onChange={handleChange} name="description" required />
-          <Field value={price} onChange={handleChange} name="price" type="number" required />
+          <Field
+            value={price}
+            onChange={handleChange}
+            name="price"
+            type="text"
+            inputMode="decimal"
+            pattern="[0-9]+([\.,][0-9]+)?"
+            required
+          />
           <Field onChange={handleChange} name="image" type="file" />
 
           {newItemId && (
