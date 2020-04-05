@@ -24,6 +24,15 @@ const Query = {
 
     // 3. Return the users
     return await ctx.db.query.users({}, info);
+  },
+  async orders(parent, args, ctx, info) {
+    loggedInGuardian(ctx);
+
+    return await ctx.db.query.orders({ where: {
+      user: {
+        id: ctx.request.userId
+      }
+    } }, info);
   }
 };
 

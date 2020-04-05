@@ -47,6 +47,7 @@ type Query {
   item(where: ItemWhereUniqueInput!, first: Int, skip: Int, last: Int): Item
   currentUser: User
   users: [User]!
+  orders: [Order]!
 }
 
 type User {

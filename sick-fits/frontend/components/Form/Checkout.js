@@ -43,7 +43,7 @@ const CheckoutForm = () => {
       data: {
         checkout: { clientSecret },
       },
-    } = await startCheckout();
+    } = await startCheckout({ refetchQueries: [{ query: CART_QUERY }] });
 
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {

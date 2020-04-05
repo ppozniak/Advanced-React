@@ -7,6 +7,12 @@ enum Permission {
   PERMISSION_UPDATE
 }
 
+type Payment {
+  id: ID! @id
+  stripeId: String! @unique
+  status: String!
+}
+
 type User {
   id: ID! @id
   name: String!
@@ -35,4 +41,12 @@ type CartItem {
   item: Item
   user: User!
   quantity: Int @default(value: 1)
+}
+
+type Order {
+  id: ID! @id
+  items: [Item!]!
+  payment: Payment!
+  total: Float!
+  user: User!
 }

@@ -302,15 +302,42 @@ const Mutations = {
             id: ctx.request.userId
           }
         },
-        "{ cart { quantity, item { price } }}"
+        "{ cart { id, quantity, item { price, id  } }}"
       );
 
       const totalCost = cart.reduce(
         (total, cartItem) => total + cartItem.quantity * (cartItem.item.price * 100)
       , 0);
-    
+
       const intent = await createPaymentIntent({
         amount: totalCost
+      });
+
+      // Create order
+      await ctx.db.mutation.createOrder({
+        data: {
+          total: totalCost,
+          user: { connect: { id: ctx.request.userId }},
+          items: {
+            // Take item ID from cartItem ONLY
+            // @TODO: Create new items instead of relying on copy
+            connect: cart.map(({ item }) => ({ id: item.id }))
+          },
+          payment: {
+            create: {
+              stripeId: intent.id,
+              status: intent.status
+            }
+          }
+        }
+      });
+
+      // Empty the basket
+      const cartItemsIds = cart.map(({ id }) => id);
+      await ctx.db.mutation.deleteManyCartItems({
+        where: {
+          id_in: cartItemsIds,
+        }
       });
 
       return { clientSecret: intent['client_secret'] };
