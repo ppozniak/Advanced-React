@@ -48,7 +48,7 @@ const Title = styled.div`
   text-transform: uppercase;
 `;
 
-const Item = ({ title, description, id, price, image, handleDelete }) => {
+const Item = ({ title, description, id, price, image, handleDelete, currentUser }) => {
   const [addToCart, { loading: addingToCart }] = useMutation(ADD_TO_CART_MUTATION, {
     variables: {
       itemId: id,
@@ -59,6 +59,12 @@ const Item = ({ title, description, id, price, image, handleDelete }) => {
       },
     ],
   });
+
+  let buttonText = 'Add to cart';
+
+  if (!currentUser) buttonText = 'Log in to add to cart';
+  else if (addingToCart) buttonText = 'Adding...';
+
   return (
     <ItemContainer>
       <Link href="item/[id]" as={`item/${id}`} passHref>
@@ -74,8 +80,8 @@ const Item = ({ title, description, id, price, image, handleDelete }) => {
       <strong>For only: {formatMoney(price)}❗</strong>
 
       <div>
-        <button type="button" onClick={addToCart} disabled={addingToCart}>
-          {addingToCart ? 'Adding...' : 'Add to cart'}
+        <button type="button" onClick={addToCart} disabled={addingToCart || !currentUser}>
+          {buttonText}
         </button>
 
         {handleDelete && (

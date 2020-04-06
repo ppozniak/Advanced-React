@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import Item from '../components/Item';
 import Pagination from '../components/Pagination';
+import useCurrentUser from '../components/useCurrentUser';
 
 const ItemsContainer = styled.div`
   display: grid;
@@ -45,6 +46,7 @@ const Home = () => {
       skip: (currentPage - 1) * ITEMS_PER_PAGE,
     },
   });
+  const { currentUser } = useCurrentUser();
 
   if (loading) return <i>Loading...</i>;
   if (error) return <strong>Error :(</strong>;
@@ -65,7 +67,7 @@ const Home = () => {
       <Pagination currentPage={currentPage} totalItems={totalItems} totalPages={totalPages} />
       <ItemsContainer>
         {data.items.map(item => (
-          <Item key={item.id} {...item} />
+          <Item key={item.id} {...item} currentUser={currentUser} />
         ))}
       </ItemsContainer>
     </>
