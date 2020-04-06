@@ -77,13 +77,18 @@ const CheckoutForm = () => {
           {cartItem.item.title} - {cartItem.quantity}x
         </p>
       ))}
-      <form onSubmit={handleSubmit}>
-        <CardElement hidePostalCode />
-        <button disabled={loadingCheckout} type="submit">
-          Pay now
-        </button>
-      </form>
-      {paymentStatus}
+      {items.length === 0 && 'Your cart is empty'}
+      {!!items.length && (
+        <>
+          <form onSubmit={handleSubmit}>
+            <CardElement hidePostalCode />
+            <button disabled={loadingCheckout} type="submit">
+              Pay now
+            </button>
+          </form>
+          {paymentStatus}
+        </>
+      )}
     </LogInGuard>
   );
 };

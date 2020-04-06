@@ -236,12 +236,14 @@ const Cart = () => {
           ))}
       </ul>
 
-      <footer>
-        <p>{formatMoney(totalPrice)}</p>
-        <Link href="/checkout" passHref>
-          <SickButton as="a">Checkout</SickButton>
-        </Link>
-      </footer>
+      {currentUser && !!currentUser.cart.length && (
+        <footer>
+          <p>{formatMoney(totalPrice)}</p>
+          <Link href="/checkout" passHref>
+            <SickButton as="a">Checkout</SickButton>
+          </Link>
+        </footer>
+      )}
     </CartStyles>
   );
 };
