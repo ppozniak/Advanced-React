@@ -45,8 +45,19 @@ type CartItem {
 
 type Order {
   id: ID! @id
-  items: [Item!]!
+  items: [OrderItem!]!
   payment: Payment!
   total: Float!
   user: User!
+  createdAt: DateTime! @createdAt
+}
+
+type OrderItem {
+  id: ID! @id
+  itemConnection: Item
+  title: String!
+  image: String
+  description: String
+  price: Int!
+  quantity: Int!
 }

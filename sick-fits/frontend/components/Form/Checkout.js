@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import NProgress from 'nprogress';
 import ErrorMessage from '../ErrorMessage';
 import LogInGuard from '../LogInGuard';
-import useCurrentUser from '../useCurrentUser';
 import { CART_QUERY, CLOSE_CART_MUTATION } from '../Cart';
 
 const CHECKOUT_MUTATION = gql`
@@ -16,11 +16,11 @@ const CHECKOUT_MUTATION = gql`
 `;
 
 const CheckoutForm = () => {
-  const { data, loading, error } = useCurrentUser();
   const { data: cartData, loading: cartLoading, error: cartError } = useQuery(CART_QUERY);
   const [closeCart] = useMutation(CLOSE_CART_MUTATION);
   const [startCheckout, { loading: loadingCheckout }] = useMutation(CHECKOUT_MUTATION);
   const [paymentStatus, setPaymentStatus] = useState();
+  const [checkoutDisabled, setCheckoutDisabled] = useState(true);
 
   const items = (cartData && cartData.currentUser && cartData.currentUser.cart) || [];
 
@@ -39,6 +39,10 @@ const CheckoutForm = () => {
       return;
     }
 
+    const cardElement = elements.getElement(CardElement);
+    if (cardElement._empty || cardElement._invalid) return;
+
+    NProgress.start();
     const {
       data: {
         checkout: { clientSecret },
@@ -47,7 +51,7 @@ const CheckoutForm = () => {
 
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: elements.getElement(CardElement),
+        card: cardElement,
       },
     });
 
@@ -63,13 +67,17 @@ const CheckoutForm = () => {
       // post-payment actions.
       setPaymentStatus('Success');
     }
+    NProgress.done();
+  };
+
+  const handleChange = event => {
+    const valid = event.complete && !event.error;
+    setCheckoutDisabled(!valid);
   };
 
   return (
     <LogInGuard>
-      {error && <ErrorMessage error={error} />}
       {cartError && <ErrorMessage error={cartError} />}
-      {loading && 'Loading user data...'}
       {cartLoading && 'Loading your cart items...'}
       <h1>Checkout</h1>
       {items.map(cartItem => (
@@ -77,18 +85,16 @@ const CheckoutForm = () => {
           {cartItem.item.title} - {cartItem.quantity}x
         </p>
       ))}
-      {items.length === 0 && 'Your cart is empty'}
+      {items.length === 0 && !paymentStatus && 'Your cart is empty'}
       {!!items.length && (
-        <>
-          <form onSubmit={handleSubmit}>
-            <CardElement hidePostalCode />
-            <button disabled={loadingCheckout} type="submit">
-              Pay now
-            </button>
-          </form>
-          {paymentStatus}
-        </>
+        <form onSubmit={handleSubmit}>
+          <CardElement hidePostalCode onChange={handleChange} />
+          <button disabled={loadingCheckout || checkoutDisabled} type="submit">
+            Pay now
+          </button>
+        </form>
       )}
+      {paymentStatus}
     </LogInGuard>
   );
 };

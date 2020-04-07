@@ -302,7 +302,19 @@ const Mutations = {
             id: ctx.request.userId
           }
         },
-        "{ cart { id, quantity, item { price, id  } }}"
+        `{ 
+          cart {
+            id, 
+            quantity, 
+            item {
+              id, 
+              title  
+              description, 
+              price, 
+              image, 
+            } 
+          }
+        }`
       );
 
       const totalCost = cart.reduce(
@@ -319,9 +331,18 @@ const Mutations = {
           total: totalCost,
           user: { connect: { id: ctx.request.userId }},
           items: {
-            // Take item ID from cartItem ONLY
-            // @TODO: Create new items instead of relying on copy
-            connect: cart.map(({ item }) => ({ id: item.id }))
+            create: cart.map(({ item, quantity }) => ({
+              title: item.title,
+              description: item.description,
+              image: item.image,
+              price: item.price,
+              quantity,
+              itemConnection: {
+                connect: {
+                  id: item.id
+                }
+              }
+            }))
           },
           payment: {
             create: {

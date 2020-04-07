@@ -15,6 +15,12 @@ const QUERY_ORDERS = gql`
       }
       items {
         title
+        description
+        image
+        quantity
+        itemConnection {
+          id
+        }
       }
       total
     }
