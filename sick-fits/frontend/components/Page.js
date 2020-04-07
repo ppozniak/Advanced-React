@@ -5,6 +5,7 @@ import Meta from './Meta';
 
 const theme = {
   red: '#FF0000',
+  darkerRed: '#AA2200',
   black: '#131313',
   grey: '#3A3A3A',
   lightgrey: '#E1E1E1',
@@ -33,20 +34,28 @@ const GlobalStyles = createGlobalStyle`
     font-weight: normal;
     font-style: normal;
   }
+
   html {
     box-sizing: border-box;
     font-size: 10px;
   }
+
   *, *:before, *:after {
     box-sizing: inherit;
   }
+
   body {
     padding: 0;
     margin: 0;
-    font-size: 1.5rem;
-    line-height: 2;
+    line-height: 1.5;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1.5rem;
   }
+
+  p {
+    font-size: 1.2rem;
+  }
+
   a {
     text-decoration: underline;
     color: ${theme.blue};

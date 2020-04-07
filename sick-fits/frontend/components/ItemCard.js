@@ -4,19 +4,24 @@ import styled from 'styled-components';
 import { useMutation } from '@apollo/react-hooks';
 import formatMoney from '../lib/formatMoney';
 import { ADD_TO_CART_MUTATION, CART_QUERY } from './Cart';
+import SickButton from './styles/SickButton';
+import PriceTag from './styles/PriceTag';
 
 const ItemContainer = styled.div`
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
   text-align: center;
-  min-height: 10rem;
-  box-shadow: 3px 3px 12px #00000043;
+  min-height: 11.5rem;
+  box-shadow: 3px 3px 12px #00000025;
   overflow: hidden;
+  padding: 1rem;
 `;
 
 const Thumbnail = styled.img`
   display: block;
   width: 100%;
-  max-height: 125px;
+  height: 140px;
   margin: 0 auto;
   object-fit: cover;
   object-position: top center;
@@ -25,30 +30,26 @@ const Thumbnail = styled.img`
   margin-top: -20px;
 `;
 
-const FakeThumbnail = styled.div`
+const FakeThumbnail = styled(Thumbnail)`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 125px;
-  object-position: top center;
-  transform: rotate(3deg) scaleX(1.2);
   background-color: #ccc;
   text-align: left;
-  margin-bottom: 20px;
-  margin-top: -20px;
-
+  font-size: 5rem;
   &:before {
-    display: block;
-    content: '💯';
+    display: inline-block;
+    content: '❔';
   }
 `;
 
 const Title = styled.div`
   font-size: 2rem;
   text-transform: uppercase;
+  margin-bottom: 1rem;
 `;
 
-const Item = ({ title, description, id, price, image, handleDelete, currentUser }) => {
+const ItemCard = ({ title, description, id, price, image, currentUser }) => {
   const [addToCart, { loading: addingToCart }] = useMutation(ADD_TO_CART_MUTATION, {
     variables: {
       itemId: id,
@@ -68,30 +69,27 @@ const Item = ({ title, description, id, price, image, handleDelete, currentUser 
   return (
     <ItemContainer>
       <Link href="item/[id]" as={`item/${id}`} passHref>
-        <a>
+        <a style={{ textDecoration: 'none' }}>
           {image && <Thumbnail src={image} alt="" />}
-          {!image && <FakeThumbnail />}
-          <Title>{title}</Title>
+          {!image && <FakeThumbnail as="div" />}
         </a>
       </Link>
 
+      <Title>{title}</Title>
       <p>{description}</p>
 
-      <strong>For only: {formatMoney(price)}❗</strong>
+      <PriceTag>{formatMoney(price)}</PriceTag>
 
-      <div>
-        <button type="button" onClick={addToCart} disabled={addingToCart || !currentUser}>
-          {buttonText}
-        </button>
-
-        {handleDelete && (
-          <button type="button" onClick={handleDelete}>
-            Delete ❌
-          </button>
-        )}
-      </div>
+      <SickButton
+        fullWidth
+        type="button"
+        onClick={addToCart}
+        disabled={addingToCart || !currentUser}
+      >
+        {buttonText}
+      </SickButton>
     </ItemContainer>
   );
 };
 
-export default Item;
+export default ItemCard;

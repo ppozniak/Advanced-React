@@ -3,13 +3,13 @@ import { useQuery } from '@apollo/react-hooks';
 import { gql } from 'apollo-boost';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
-import Item from '../components/Item';
+import ItemCard from '../components/ItemCard';
 import Pagination from '../components/Pagination';
 import useCurrentUser from '../components/useCurrentUser';
 
 const ItemsContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 250px));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   grid-gap: 20px;
 `;
 
@@ -67,7 +67,7 @@ const Home = () => {
       <Pagination currentPage={currentPage} totalItems={totalItems} totalPages={totalPages} />
       <ItemsContainer>
         {data.items.map(item => (
-          <Item key={item.id} {...item} currentUser={currentUser} />
+          <ItemCard key={item.id} {...item} currentUser={currentUser} />
         ))}
       </ItemsContainer>
     </>
