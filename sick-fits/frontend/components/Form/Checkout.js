@@ -3,9 +3,25 @@ import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import NProgress from 'nprogress';
+import styled from 'styled-components';
 import ErrorMessage from '../ErrorMessage';
 import LogInGuard from '../LogInGuard';
 import { CART_QUERY, CLOSE_CART_MUTATION } from '../Cart';
+import Item, { ItemsTotal } from '../Item';
+import calcTotalPrice from '../../lib/calcTotalPrice';
+import SickButton from '../styles/SickButton';
+
+const Form = styled.form`
+  border: 1px solid black;
+  padding: 3rem;
+  margin-top: 2rem;
+  display: flex;
+  align-content: center;
+
+  .StripeElement {
+    flex: 1;
+  }
+`;
 
 const CHECKOUT_MUTATION = gql`
   mutation CHECKOUT_MUTATION {
@@ -75,24 +91,38 @@ const CheckoutForm = () => {
     setCheckoutDisabled(!valid);
   };
 
+  const totalPrice = calcTotalPrice(items);
+
   return (
     <LogInGuard>
       {cartError && <ErrorMessage error={cartError} />}
       {cartLoading && 'Loading your cart items...'}
       <h1>Checkout</h1>
-      {items.map(cartItem => (
-        <p key={cartItem.id}>
-          {cartItem.item.title} - {cartItem.quantity}x
-        </p>
-      ))}
+      <ul>
+        {items.map(({ quantity, item, id }) => (
+          <Item
+            key={id}
+            title={item.title}
+            description={item.description}
+            image={item.image}
+            price={item.price}
+            quantity={quantity}
+          />
+        ))}
+      </ul>
+      <ItemsTotal total={totalPrice} />
       {items.length === 0 && !paymentStatus && 'Your cart is empty'}
       {!!items.length && (
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
           <CardElement hidePostalCode onChange={handleChange} />
-          <button disabled={loadingCheckout || checkoutDisabled} type="submit">
+          <SickButton
+            style={{ marginLeft: '2rem', marginTop: '-1.25rem' }}
+            disabled={loadingCheckout || checkoutDisabled}
+            type="submit"
+          >
             Pay now
-          </button>
-        </form>
+          </SickButton>
+        </Form>
       )}
       {paymentStatus}
     </LogInGuard>

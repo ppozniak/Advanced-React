@@ -10,6 +10,8 @@ import Supreme from './styles/Supreme';
 import SickButton from './styles/SickButton';
 import ErrorMessage from './ErrorMessage';
 import formatMoney from '../lib/formatMoney';
+import Item from './Item';
+import calcTotalPrice from '../lib/calcTotalPrice';
 
 export const ADD_TO_CART_MUTATION = gql`
   mutation ADD_TO_CART_MUTATION($itemId: ID!) {
@@ -40,7 +42,9 @@ export const CART_QUERY = gql`
         item {
           id
           title
+          description
           price
+          image
         }
       }
     }
@@ -152,44 +156,41 @@ export const CartItemsQuantity = ({ quantity = 0, loading = false }) => (
   </Dot>
 );
 
-const CartItem = ({ title, price, quantity, id }) => {
-  const [removeFromCart, { loading: removingFromCart }] = useMutation(REMOVE_FROM_CART_MUTATION, {
-    variables: {
-      cartItemId: id,
-    },
-    refetchQueries: [{ query: CART_QUERY }],
-    optimisticResponse: {
-      __typename: 'MUTATION',
-      removeFromCart: {
-        __typename: 'CartItem',
-        id,
-      },
-    },
-    update: (cache, { data }) => {
-      const deletedCartItemId = data.removeFromCart.id;
-      const { currentUser } = cache.readQuery({ query: CART_QUERY });
+const CartItem = ({ title, description, image, price, quantity, id }) => (
+  // const [removeFromCart, { loading: removingFromCart }] = useMutation(REMOVE_FROM_CART_MUTATION, {
+  //   variables: {
+  //     cartItemId: id,
+  //   },
+  //   refetchQueries: [{ query: CART_QUERY }],
+  //   optimisticResponse: {
+  //     __typename: 'MUTATION',
+  //     removeFromCart: {
+  //       __typename: 'CartItem',
+  //       id,
+  //     },
+  //   },
+  //   update: (cache, { data }) => {
+  //     const deletedCartItemId = data.removeFromCart.id;
+  //     const { currentUser } = cache.readQuery({ query: CART_QUERY });
 
-      const newCart = [...currentUser.cart].filter(cartItem => cartItem.id !== deletedCartItemId);
-      const newData = { currentUser: { ...currentUser, cart: newCart } };
+  //     const newCart = [...currentUser.cart].filter(cartItem => cartItem.id !== deletedCartItemId);
+  //     const newData = { currentUser: { ...currentUser, cart: newCart } };
 
-      cache.writeQuery({ query: CART_QUERY, data: newData });
-    },
-  });
+  //     cache.writeQuery({ query: CART_QUERY, data: newData });
+  //   },
+  // });
 
-  const itemCartString = `${title} - x${quantity} = ${formatMoney(price * quantity)} (${formatMoney(
-    price
-  )} pu)`;
-
-  return (
-    <li>
-      {(title && quantity && itemCartString) || 'This item was deleted from our website.'}
-      <button type="button" onClick={removeFromCart} disabled={removingFromCart}>
-        {removingFromCart ? 'Removing...' : '🗑'}
-      </button>
-    </li>
-  );
-};
-
+  // @TODO: Handle deleted items {(title && quantity && itemCartString) || 'This item was deleted from our website.'}
+  // @TODO: Add ability to remove items
+  <Item
+    key={id}
+    title={title}
+    quantity={quantity}
+    image={image}
+    description={description}
+    price={price}
+  />
+);
 //  If item was deleted it will be null
 const onlyWithExistingItems = ({ item }) => !!item;
 
@@ -206,10 +207,7 @@ const Cart = () => {
     0
   );
 
-  const totalPrice = cartItemsWithExistingItems.reduce(
-    (total, { quantity, item }) => total + quantity * item.price,
-    0
-  );
+  const totalPrice = calcTotalPrice(cartItemsWithExistingItems);
 
   return (
     <CartStyles open={cartOpen}>
@@ -231,6 +229,8 @@ const Cart = () => {
               key={id}
               quantity={quantity}
               title={item && item.title}
+              description={item && item.description}
+              image={item && item.image}
               price={item && item.price}
             />
           ))}
@@ -238,7 +238,7 @@ const Cart = () => {
 
       {currentUser && !!currentUser.cart.length && (
         <footer>
-          <p>{formatMoney(totalPrice)}</p>
+          <span>Total: {formatMoney(totalPrice)}</span>
           <Link href="/checkout" passHref>
             <SickButton as="a">Checkout</SickButton>
           </Link>
