@@ -3,6 +3,7 @@ import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 import styled from 'styled-components';
 import { formatRelative } from 'date-fns';
+import Link from 'next/link';
 import LogInGuard from '../components/LogInGuard';
 import ErrorMessage from '../components/ErrorMessage';
 import Item, { ItemsTotal } from '../components/Item';
@@ -53,6 +54,7 @@ export const ORDERS_QUERY = gql`
         status
       }
       items {
+        id
         title
         description
         image
@@ -67,6 +69,23 @@ export const ORDERS_QUERY = gql`
     }
   }
 `;
+
+const ItemLink = styled.a`
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+function LinkWrapper({ children, href }) {
+  return (
+    <Link href="item/[id]" as={href} passHref>
+      <ItemLink>{children}</ItemLink>
+    </Link>
+  );
+}
 
 const OrdersPage = () => {
   const { data, loading, error } = useQuery(ORDERS_QUERY);
@@ -88,18 +107,25 @@ const OrdersPage = () => {
               <PaymentStatus>{payment.status}</PaymentStatus>
             </OrderHeader>
             <ItemsList>
-              {/* @TODO: Add link to item connection */}
               {/* @TODO: Show warning if item connection price has changed */}
-              {items.map(({ id, title, description, image, itemConnection, price, quantity }) => (
-                <Item
-                  key={id}
-                  title={title}
-                  description={description}
-                  image={image}
-                  price={price}
-                  quantity={quantity}
-                />
-              ))}
+              {items.map(({ id, title, description, image, itemConnection, price, quantity }) => {
+                const href = itemConnection && `item/${itemConnection.id}`;
+                const ConditionalLinkWrapper = ({ children }) =>
+                  href ? <LinkWrapper href={href}>{children}</LinkWrapper> : children;
+
+                return (
+                  <ConditionalLinkWrapper key={id}>
+                    <Item
+                      title={title}
+                      description={description}
+                      image={image}
+                      price={price}
+                      quantity={quantity}
+                      href={href}
+                    />
+                  </ConditionalLinkWrapper>
+                );
+              })}
               <ItemsTotal total={total} />
             </ItemsList>
           </Order>
