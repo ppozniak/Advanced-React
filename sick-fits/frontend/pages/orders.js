@@ -112,6 +112,7 @@ const OrdersPage = () => {
                 const href = itemConnection && `item/${itemConnection.id}`;
                 const ConditionalLinkWrapper = ({ children }) =>
                   href ? <LinkWrapper href={href}>{children}</LinkWrapper> : children;
+                const priceHasChanged = itemConnection && itemConnection.price !== price;
 
                 return (
                   <ConditionalLinkWrapper key={id}>
@@ -122,6 +123,7 @@ const OrdersPage = () => {
                       price={price}
                       quantity={quantity}
                       href={href}
+                      warning={priceHasChanged || !href}
                     />
                   </ConditionalLinkWrapper>
                 );

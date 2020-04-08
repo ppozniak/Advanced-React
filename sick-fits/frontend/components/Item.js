@@ -101,7 +101,13 @@ const DeleteButton = styled.button`
   }
 `;
 
-const Item = ({ title, description, price, image, quantity, handleDelete, loading }) => {
+const WarningIcon = styled.span`
+  font-size: 0.9em;
+  opacity: 0.7;
+  cursor: help;
+`;
+
+const Item = ({ title, description, price, image, quantity, handleDelete, loading, warning }) => {
   const itemDeleted = !title && !description && !price;
 
   // For deleted items
@@ -127,8 +133,15 @@ const Item = ({ title, description, price, image, quantity, handleDelete, loadin
         <p>{description}</p>
       </ContentWrapper>
 
-      <PriceTag>{formatMoney(price)}</PriceTag>
-      <Quantity>{quantity}</Quantity>
+      <PriceTag>
+        {formatMoney(price)}
+        {warning && (
+          <WarningIcon title="This item has now a different price than when you bought it or it was deleted.">
+            ⚠
+          </WarningIcon>
+        )}
+      </PriceTag>
+      <Quantity>{quantity} </Quantity>
       {handleDelete && <DeleteButton onClick={handleDelete}>&times;</DeleteButton>}
     </ItemContainer>
   );
