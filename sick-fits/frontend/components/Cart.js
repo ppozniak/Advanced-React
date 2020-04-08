@@ -156,41 +156,44 @@ export const CartItemsQuantity = ({ quantity = 0, loading = false }) => (
   </Dot>
 );
 
-const CartItem = ({ title, description, image, price, quantity, id }) => (
-  // const [removeFromCart, { loading: removingFromCart }] = useMutation(REMOVE_FROM_CART_MUTATION, {
-  //   variables: {
-  //     cartItemId: id,
-  //   },
-  //   refetchQueries: [{ query: CART_QUERY }],
-  //   optimisticResponse: {
-  //     __typename: 'MUTATION',
-  //     removeFromCart: {
-  //       __typename: 'CartItem',
-  //       id,
-  //     },
-  //   },
-  //   update: (cache, { data }) => {
-  //     const deletedCartItemId = data.removeFromCart.id;
-  //     const { currentUser } = cache.readQuery({ query: CART_QUERY });
+const CartItem = ({ title, description, image, price, quantity, id }) => {
+  const [removeFromCart, { loading: removingFromCart }] = useMutation(REMOVE_FROM_CART_MUTATION, {
+    variables: {
+      cartItemId: id,
+    },
+    refetchQueries: [{ query: CART_QUERY }],
+    optimisticResponse: {
+      __typename: 'MUTATION',
+      removeFromCart: {
+        __typename: 'CartItem',
+        id,
+      },
+    },
+    update: (cache, { data }) => {
+      const deletedCartItemId = data.removeFromCart.id;
+      const { currentUser } = cache.readQuery({ query: CART_QUERY });
 
-  //     const newCart = [...currentUser.cart].filter(cartItem => cartItem.id !== deletedCartItemId);
-  //     const newData = { currentUser: { ...currentUser, cart: newCart } };
+      const newCart = [...currentUser.cart].filter(cartItem => cartItem.id !== deletedCartItemId);
+      const newData = { currentUser: { ...currentUser, cart: newCart } };
 
-  //     cache.writeQuery({ query: CART_QUERY, data: newData });
-  //   },
-  // });
+      cache.writeQuery({ query: CART_QUERY, data: newData });
+    },
+  });
 
-  // @TODO: Handle deleted items {(title && quantity && itemCartString) || 'This item was deleted from our website.'}
   // @TODO: Add ability to remove items
-  <Item
-    key={id}
-    title={title}
-    quantity={quantity}
-    image={image}
-    description={description}
-    price={price}
-  />
-);
+  return (
+    <Item
+      key={id}
+      title={title}
+      quantity={quantity}
+      image={image}
+      description={description}
+      price={price}
+      handleDelete={removeFromCart}
+      loading={removingFromCart}
+    />
+  );
+};
 //  If item was deleted it will be null
 const onlyWithExistingItems = ({ item }) => !!item;
 

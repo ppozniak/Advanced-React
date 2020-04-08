@@ -28,7 +28,7 @@ const FakeThumbnail = styled(Thumbnail)`
   align-items: center;
   &:before {
     display: block;
-    content: '❔';
+    content: '${props => (props.deleted ? '🗑' : '❔')}';
   }
 `;
 
@@ -63,20 +63,60 @@ const Quantity = styled.div`
   }
 `;
 
-const Item = ({ title, description, price, image, quantity }) => (
-  <ItemContainer>
-    {image && <Thumbnail src={image} alt="" />}
-    {!image && <FakeThumbnail as="div" />}
+const DeleteButton = styled.button`
+  padding: 0.5rem;
+  margin-left: 1rem;
+  border-radius: 50%;
+  background: ${props => props.theme.lightgrey};
+  border: 1px solid ${props => props.theme.grey};
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+  font-size: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    <ContentWrapper>
-      <Title>{title}</Title>
-      <p>{description}</p>
-    </ContentWrapper>
+  &:hover {
+    color: #fff;
+    background-color: ${props => props.theme.grey};
+  }
+`;
 
-    <PriceTag>{formatMoney(price)}</PriceTag>
-    <Quantity>{quantity}</Quantity>
-  </ItemContainer>
-);
+const Item = ({ title, description, price, image, quantity, handleDelete }) => {
+  const itemDeleted = !title && !description && !price;
+
+  // For deleted items
+  if (itemDeleted)
+    return (
+      <ItemContainer>
+        <FakeThumbnail as="div" deleted />
+        <ContentWrapper>
+          <Title>Deleted item</Title>
+          <p>This item is no longer available.</p>
+        </ContentWrapper>
+        {handleDelete && <DeleteButton onClick={handleDelete}>&times;</DeleteButton>}
+      </ItemContainer>
+    );
+
+  return (
+    <ItemContainer>
+      {image && <Thumbnail src={image} alt="" />}
+      {!image && <FakeThumbnail as="div" />}
+
+      <ContentWrapper>
+        <Title>{title}</Title>
+        <p>{description}</p>
+      </ContentWrapper>
+
+      <PriceTag>{formatMoney(price)}</PriceTag>
+      <Quantity>{quantity}</Quantity>
+      {handleDelete && <DeleteButton onClick={handleDelete}>&times;</DeleteButton>}
+    </ItemContainer>
+  );
+};
 
 export const ItemsTotal = ({ total }) => (
   <ItemsTotalContainer>
