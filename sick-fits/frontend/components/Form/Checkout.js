@@ -10,6 +10,7 @@ import { CART_QUERY, CLOSE_CART_MUTATION } from '../Cart';
 import Item, { ItemsTotal } from '../Item';
 import calcTotalPrice from '../../lib/calcTotalPrice';
 import SickButton from '../styles/SickButton';
+import { ORDERS_QUERY } from '../../pages/orders';
 
 const Form = styled.form`
   border: 1px solid black;
@@ -34,7 +35,9 @@ const CHECKOUT_MUTATION = gql`
 const CheckoutForm = () => {
   const { data: cartData, loading: cartLoading, error: cartError } = useQuery(CART_QUERY);
   const [closeCart] = useMutation(CLOSE_CART_MUTATION);
-  const [startCheckout, { loading: loadingCheckout }] = useMutation(CHECKOUT_MUTATION);
+  const [startCheckout, { loading: loadingCheckout }] = useMutation(CHECKOUT_MUTATION, {
+    refetchQueries: [{ query: ORDERS_QUERY }],
+  });
   const [paymentStatus, setPaymentStatus] = useState();
   const [checkoutDisabled, setCheckoutDisabled] = useState(true);
 

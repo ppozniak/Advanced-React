@@ -28,7 +28,7 @@ const Query = {
   async orders(parent, args, ctx, info) {
     loggedInGuardian(ctx);
 
-    return await ctx.db.query.orders({ where: {
+    return await ctx.db.query.orders({ orderBy: 'createdAt_DESC', where: {
       user: {
         id: ctx.request.userId
       }
