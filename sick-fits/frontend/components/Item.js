@@ -3,9 +3,25 @@ import styled from 'styled-components';
 import formatMoney from '../lib/formatMoney';
 
 const ItemContainer = styled.li`
+  @keyframes smoothBlink {
+    from {
+      opacity: 100%;
+    }
+
+    to {
+      opacity: 25%;
+    }
+  }
+
   display: flex;
   padding: 1.5rem;
   align-items: center;
+
+  ${props =>
+    props.loading &&
+    `
+    animation: smoothBlink .7s infinite forwards alternate ease-out;
+  `}
 `;
 
 const ItemsTotalContainer = styled.div`
@@ -85,13 +101,13 @@ const DeleteButton = styled.button`
   }
 `;
 
-const Item = ({ title, description, price, image, quantity, handleDelete }) => {
+const Item = ({ title, description, price, image, quantity, handleDelete, loading }) => {
   const itemDeleted = !title && !description && !price;
 
   // For deleted items
   if (itemDeleted)
     return (
-      <ItemContainer>
+      <ItemContainer loading={loading || undefined}>
         <FakeThumbnail as="div" deleted />
         <ContentWrapper>
           <Title>Deleted item</Title>
@@ -102,7 +118,7 @@ const Item = ({ title, description, price, image, quantity, handleDelete }) => {
     );
 
   return (
-    <ItemContainer>
+    <ItemContainer loading={loading || undefined}>
       {image && <Thumbnail src={image} alt="" />}
       {!image && <FakeThumbnail as="div" />}
 
