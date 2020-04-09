@@ -36,6 +36,7 @@ const Thumbnail = styled.img`
   width: 8rem;
   object-fit: cover;
   margin-right: 1rem;
+  flex-shrink: 0;
 `;
 
 const FakeThumbnail = styled(Thumbnail)`

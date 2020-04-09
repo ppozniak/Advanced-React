@@ -2,6 +2,7 @@ import React from 'react';
 import { gql } from 'apollo-boost';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useRouter } from 'next/router';
+import currency from 'currency.js';
 import { ITEM_QUERY } from './index';
 import { Form, Field, useForm } from '../../../components/Form';
 import LogInGuard from '../../../components/LogInGuard';
@@ -38,20 +39,34 @@ const UPDATE_ITEM_MUTATION = gql`
 
 const Update = () => {
   // Form
-  const { inputs, setInputs, handleChange } = useForm({});
+  const { inputs, setInputs, handleChange } = useForm({
+    title: '',
+    description: '',
+    price: 0,
+    image: '',
+    largeImage: '',
+  });
 
   // Hooks
   const {
     replace,
     query: { id },
   } = useRouter();
-  const { loading, data, error } = useQuery(ITEM_QUERY, { variables: { id } });
+  const { loading, data, error } = useQuery(ITEM_QUERY, {
+    variables: { id },
+    onCompleted: () => {
+      setInputs({
+        ...data.item,
+        price: currency(data.item.price / 100),
+      });
+    },
+  });
   const [updateItem, { loading: updating, error: updateError }] = useMutation(
     UPDATE_ITEM_MUTATION,
     {
       variables: {
         ...inputs,
-        price: parseFloat(inputs.price) * 100,
+        price: currency(inputs.price).intValue,
         id,
       },
       update: invalidateItemsCache,
@@ -87,18 +102,15 @@ const Update = () => {
           <h2>Update item</h2>
           <h3>Item ID: {data.item.id}</h3>
           <fieldset disabled={updating} aria-busy={updating}>
-            <Field onChange={handleChange} name="title" defaultValue={data.item.title} />
-            <Field
-              onChange={handleChange}
-              name="description"
-              defaultValue={data.item.description}
-            />
+            <Field onChange={handleChange} name="title" value={inputs.title} />
+            <Field onChange={handleChange} name="description" value={inputs.description} />
             <Field
               onChange={handleChange}
               name="price"
+              value={inputs.price}
               inputMode="decimal"
-              pattern="[0-9]+([\.,][0-9]+)?"
-              defaultValue={data.item.price / 100}
+              pattern="[0-9]{1,7}([\.][0-9]{0,2})?"
+              label="Price (£)"
             />
 
             {/* @TODO: deal with image later */}

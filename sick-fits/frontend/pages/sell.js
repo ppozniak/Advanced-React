@@ -2,6 +2,7 @@ import React from 'react';
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
+import currency from 'currency.js';
 import { Form, Field, useForm } from '../components/Form';
 import ErrorMessage from '../components/ErrorMessage';
 import LogInGuard from '../components/LogInGuard';
@@ -42,7 +43,7 @@ const SellPage = () => {
     createItem,
     { data: { createItem: { id: newItemId } = {} } = {}, error, loading },
   ] = useMutation(CREATE_ITEM_MUTATION, {
-    variables: { ...inputs, price: parseFloat(inputs.price) * 100 },
+    variables: { ...inputs, price: currency(inputs.price).intValue },
     refetchQueries: [{ query: ALL_ITEMS_QUERY, variables: { first: ITEMS_PER_PAGE, skip: 0 } }], // Refresh only first page, as new items are on the first page
   });
 
@@ -93,7 +94,8 @@ const SellPage = () => {
             name="price"
             type="text"
             inputMode="decimal"
-            pattern="[0-9]+([\.,][0-9]+)?"
+            pattern="[0-9]{1,7}([\.][0-9]{0,2})?"
+            label="Price (£)"
             required
           />
           <Field onChange={handleChange} name="image" type="file" />

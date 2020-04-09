@@ -1,11 +1,29 @@
+import currency from 'currency.js';
+
+const formatterOptions = {
+  style: 'currency',
+  currency: 'GBP',
+};
+
+const formatterFractions = new Intl.NumberFormat('en-GB', {
+  ...formatterOptions,
+  minimumFractionDigits: 2,
+});
+
+const formatterNoFractions = new Intl.NumberFormat('en-GB', {
+  ...formatterOptions,
+  minimumFractionDigits: 0,
+});
+
 export default function(amount) {
-  const options = {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-  };
-  // if its a whole, dollar amount, leave off the .00
-  if (amount % 1 === 0) options.minimumFractionDigits = 0;
-  const formatter = new Intl.NumberFormat('en-GB', options);
-  return formatter.format(amount / 100);
+  const { value } = currency(amount / 100, {
+    formatWithSymbol: true,
+    symbol: '£',
+  });
+
+  // if its a whole amount, leave off the .00
+  if (value % 1 === 0) {
+    return formatterNoFractions.format(value);
+  }
+  return formatterFractions.format(value);
 }
