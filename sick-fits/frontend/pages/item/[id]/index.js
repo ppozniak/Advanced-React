@@ -9,6 +9,8 @@ import formatMoney from '../../../lib/formatMoney';
 import { invalidateItemsCache } from '../../index';
 import useCurrentUser from '../../../hooks/useCurrentUser';
 import { CART_QUERY } from '../../../components/Cart';
+import useAddToCart from '../../../hooks/useAddToCart';
+import SickButton from '../../../components/styles/SickButton';
 
 export const ITEM_QUERY = gql`
   query ITEM_QUERY($id: ID!) {
@@ -48,11 +50,42 @@ align-items: flex-end;
   height: 200px;
 `;
 
+const PriceTag = styled.div`
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+`;
+
+const ToolButton = styled.button`
+  display: inline-block;
+  height: auto;
+  border: 1px solid ${props => props.theme.grey};
+  background: none;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  padding: 1rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Footer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+`;
+
 const Item = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { isUserAdmin, isUserCreatorOfItem } = useCurrentUser();
+  const { isUserAdmin, isUserCreatorOfItem, currentUser } = useCurrentUser();
+  const { addToCart, addingToCart, buttonText } = useAddToCart({ id, currentUser });
 
   const { loading, error, data } = useQuery(ITEM_QUERY, {
     variables: { id },
@@ -83,32 +116,35 @@ const Item = () => {
         <CoverPhoto src={largeImage}>{image && <Thumbnail src={image} alt="" />}</CoverPhoto>
       )}
       <h1>{title}</h1>
-      <em>{id}</em>
       <p>{description}</p>
-      <p>Price: {formatMoney(price)}</p>
 
-      {(isUserAdmin || isUserCreatorOfItem(data.item)) && (
-        <>
+      <Footer>
+        {(isUserAdmin || isUserCreatorOfItem(data.item)) && (
           <div>
-            <Link href="/item/[id]/update" as={`/item/${id}/update`}>
-              <a>Update</a>
+            <Link href="/item/[id]/update" as={`/item/${id}/update`} passHref>
+              <ToolButton as="a">Update</ToolButton>
             </Link>
-          </div>
 
-          <button
-            type="button"
-            onClick={() =>
-              window.confirm('Are you sure you want to delete that item?') && deleteItem()
-            }
-          >
-            <div>
+            <ToolButton
+              type="button"
+              onClick={() =>
+                window.confirm('Are you sure you want to delete that item?') && deleteItem()
+              }
+            >
               {deleting && 'Deleting...'}
               {deletingError && 'Could not delete that item. Try again'}
               {!deleting && !deletingError && 'Delete item. ❌'}
-            </div>
-          </button>
-        </>
-      )}
+            </ToolButton>
+          </div>
+        )}
+
+        <div>
+          <PriceTag>Price: {formatMoney(price)}</PriceTag>
+          <SickButton onClick={addToCart} disabled={addingToCart}>
+            {buttonText}
+          </SickButton>
+        </div>
+      </Footer>
     </div>
   );
 };
