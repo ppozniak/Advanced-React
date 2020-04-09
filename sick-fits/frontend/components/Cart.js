@@ -180,7 +180,6 @@ const CartItem = ({ title, description, image, price, quantity, id }) => {
     },
   });
 
-  // @TODO: Add ability to remove items
   return (
     <Item
       key={id}

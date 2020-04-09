@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import Head from 'next/head';
 import formatMoney from '../../../lib/formatMoney';
-import { ALL_ITEMS_QUERY } from '../../index';
+import { invalidateItemsCache } from '../../index';
 import useCurrentUser from '../../../components/useCurrentUser';
 import { CART_QUERY } from '../../../components/Cart';
 
@@ -60,25 +60,9 @@ const Item = () => {
   const [deleteItem, { loading: deleting, error: deletingError }] = useMutation(
     DELETE_ITEM_MUTATION,
     {
-      refetchQueries: CART_QUERY,
       variables: { id },
-      update: (
-        cache,
-        {
-          data: {
-            deleteItem: { id: deletedItemId },
-          },
-        }
-      ) => {
-        const { items } = cache.readQuery({ query: ALL_ITEMS_QUERY });
-
-        cache.writeQuery({
-          query: ALL_ITEMS_QUERY,
-          data: {
-            items: items.filter(({ id }) => id !== deletedItemId),
-          },
-        });
-      },
+      refetchQueries: [{ query: CART_QUERY }],
+      update: invalidateItemsCache,
       onCompleted: () => {
         router.replace('/');
       },

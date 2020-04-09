@@ -107,7 +107,6 @@ const OrdersPage = () => {
               <PaymentStatus>{payment.status}</PaymentStatus>
             </OrderHeader>
             <ItemsList>
-              {/* @TODO: Show warning if item connection price has changed */}
               {items.map(({ id, title, description, image, itemConnection, price, quantity }) => {
                 const href = itemConnection && `item/${itemConnection.id}`;
                 const ConditionalLinkWrapper = ({ children }) =>

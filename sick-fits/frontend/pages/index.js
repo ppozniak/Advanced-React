@@ -7,6 +7,10 @@ import ItemCard from '../components/ItemCard';
 import Pagination from '../components/Pagination';
 import useCurrentUser from '../components/useCurrentUser';
 
+export const invalidateItemsCache = cache => {
+  Object.keys(cache.data.data).forEach(key => key.match(/^items/) && cache.data.delete(key)); // Delete all items pages
+};
+
 const ItemsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -35,7 +39,6 @@ export const ALL_ITEMS_QUERY = gql`
 `;
 
 const Home = () => {
-  // @TODO: Invalidate cache
   // @TODO: Validate page number even more
   const { query } = useRouter();
   let currentPage = parseInt(query.page, 10) || 1;
@@ -45,6 +48,7 @@ const Home = () => {
       first: 3,
       skip: (currentPage - 1) * ITEMS_PER_PAGE,
     },
+    fetchPolicy: 'cache-and-network',
   });
   const { currentUser } = useCurrentUser();
 

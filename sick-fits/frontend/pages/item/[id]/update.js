@@ -6,6 +6,7 @@ import { ITEM_QUERY } from './index';
 import { Form, Field, useForm } from '../../../components/Form';
 import LogInGuard from '../../../components/LogInGuard';
 import useCurrentUser from '../../../components/useCurrentUser';
+import { invalidateItemsCache } from '../../index';
 
 const UPDATE_ITEM_MUTATION = gql`
   mutation UPDATE_ITEM_MUTATION(
@@ -53,12 +54,12 @@ const Update = () => {
         price: parseFloat(inputs.price) * 100,
         id,
       },
+      update: invalidateItemsCache,
       onCompleted: () => {
         replace('/item/[id]', `/item/${id}`);
       },
     }
   );
-  // @TODO: Update cache
 
   const { isUserAdmin, isUserCreatorOfItem } = useCurrentUser();
 

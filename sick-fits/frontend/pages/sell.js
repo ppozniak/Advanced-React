@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Form, Field, useForm } from '../components/Form';
 import ErrorMessage from '../components/ErrorMessage';
 import LogInGuard from '../components/LogInGuard';
+import { ALL_ITEMS_QUERY, ITEMS_PER_PAGE } from '.';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -42,9 +43,10 @@ const SellPage = () => {
     { data: { createItem: { id: newItemId } = {} } = {}, error, loading },
   ] = useMutation(CREATE_ITEM_MUTATION, {
     variables: { ...inputs, price: parseFloat(inputs.price) * 100 },
+    refetchQueries: [{ query: ALL_ITEMS_QUERY, variables: { first: ITEMS_PER_PAGE, skip: 0 } }], // Refresh only first page, as new items are on the first page
   });
 
-  // @TODO: Refactor this to be less error prone
+  // @TODO: Refactor this to be have more error handling
   const handleSubmit = async event => {
     event.preventDefault();
 
