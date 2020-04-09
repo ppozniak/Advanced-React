@@ -48,6 +48,19 @@ const Title = styled.div`
   margin-bottom: 1rem;
 `;
 
+function limitWords(string, maxWords) {
+  const stringDivided = string.split(' ');
+  const isOverLimit = stringDivided.length > maxWords;
+  if (!isOverLimit) {
+    return string;
+  }
+
+  return stringDivided
+    .slice(0, maxWords)
+    .join(' ')
+    .concat('...');
+}
+
 const ItemCard = ({ title, description, id, price, image, currentUser }) => {
   const { addToCart, addingToCart, buttonText } = useAddToCart({ id, currentUser });
 
@@ -60,8 +73,8 @@ const ItemCard = ({ title, description, id, price, image, currentUser }) => {
         </a>
       </Link>
 
-      <Title>{title}</Title>
-      <p>{description}</p>
+      <Title>{limitWords(title, 5)}</Title>
+      <p>{limitWords(description, 10)}</p>
 
       <PriceTag>{formatMoney(price)}</PriceTag>
 
