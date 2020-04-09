@@ -4,6 +4,7 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import NProgress from 'nprogress';
 import styled from 'styled-components';
+import { useRouter } from 'next/router';
 import ErrorMessage from '../ErrorMessage';
 import LogInGuard from '../LogInGuard';
 import { CART_QUERY, CLOSE_CART_MUTATION } from '../Cart';
@@ -36,10 +37,11 @@ const CheckoutForm = () => {
   const { data: cartData, loading: cartLoading, error: cartError } = useQuery(CART_QUERY);
   const [closeCart] = useMutation(CLOSE_CART_MUTATION);
   const [startCheckout, { loading: loadingCheckout }] = useMutation(CHECKOUT_MUTATION, {
-    refetchQueries: [{ query: ORDERS_QUERY }],
+    refetchQueries: [{ query: ORDERS_QUERY }, { query: CART_QUERY }],
   });
   const [paymentStatus, setPaymentStatus] = useState();
   const [checkoutDisabled, setCheckoutDisabled] = useState(true);
+  const { replace } = useRouter();
 
   const items = (cartData && cartData.currentUser && cartData.currentUser.cart) || [];
 
@@ -66,7 +68,7 @@ const CheckoutForm = () => {
       data: {
         checkout: { clientSecret },
       },
-    } = await startCheckout({ refetchQueries: [{ query: CART_QUERY }] });
+    } = await startCheckout();
 
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
@@ -76,6 +78,7 @@ const CheckoutForm = () => {
 
     if (result.error) {
       // Show error to your customer (e.g., insufficient funds)
+      NProgress.done();
       setPaymentStatus(result.error.message);
     } else if (result.paymentIntent.status === 'succeeded') {
       // The payment has been processed!
@@ -84,9 +87,10 @@ const CheckoutForm = () => {
       // execution. Set up a webhook or plugin to listen for the
       // payment_intent.succeeded event that handles any business critical
       // post-payment actions.
-      setPaymentStatus('Success');
+      NProgress.done();
+      setPaymentStatus('Success, redirecting to orders...');
+      replace('/orders');
     }
-    NProgress.done();
   };
 
   const handleChange = event => {
