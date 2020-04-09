@@ -6,6 +6,7 @@ const Meta = () => (
     <meta charSet="utf-8" />
     <link rel="shortcut icon" href="/static/favicon.png" />
     <link rel="stylesheet" type="text/css" href="/static/nprogress.css" />
+    <link rel="stylesheet" type="text/css" href="/static/react-mde-all.css" />
     <title>Ink Link - Tattos, artists, venues</title>
   </Head>
 );

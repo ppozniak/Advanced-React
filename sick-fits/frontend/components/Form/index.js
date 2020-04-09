@@ -11,8 +11,7 @@ export const Field = ({
   ...rest
 }) => (
   // eslint-disable-next-line jsx-a11y/label-has-associated-control
-  <label>
-    {label.toUpperCase() || name.toUpperCase()}
+  <Label name={name} label={label}>
     <input
       onChange={onChange}
       type={type}
@@ -21,8 +20,17 @@ export const Field = ({
       required={required}
       {...rest}
     />
+  </Label>
+);
+
+const Label = ({ children, label, name }) => (
+  <label>
+    {label.toUpperCase() || name.toUpperCase()}
+    {children}
   </label>
 );
+
+Field.Label = Label;
 
 export const useForm = (defaultState = {}) => {
   const [inputs, setInputs] = useState(defaultState);
@@ -78,7 +86,7 @@ export const Form = styled.form`
       border-color: ${props => props.theme.red};
     }
   }
-  button,
+  button[type='submit'],
   input[type='submit'] {
     width: auto;
     background: red;

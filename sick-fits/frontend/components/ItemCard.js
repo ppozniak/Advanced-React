@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
+import ReactMarkdown from 'react-markdown';
 import formatMoney from '../lib/formatMoney';
 import SickButton from './styles/SickButton';
 import PriceTag from './styles/PriceTag';
@@ -74,7 +75,10 @@ const ItemCard = ({ title, description, id, price, image, currentUser }) => {
       </Link>
 
       <Title>{limitWords(title, 5)}</Title>
-      <p>{limitWords(description, 10)}</p>
+
+      <ReactMarkdown allowedTypes={['text', 'paragraph']} unwrapDisallowed>
+        {limitWords(description, 10)}
+      </ReactMarkdown>
 
       <PriceTag>{formatMoney(price)}</PriceTag>
 

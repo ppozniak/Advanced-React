@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
@@ -7,6 +7,7 @@ import { Form, Field, useForm } from '../components/Form';
 import ErrorMessage from '../components/ErrorMessage';
 import LogInGuard from '../components/LogInGuard';
 import { ALL_ITEMS_QUERY, ITEMS_PER_PAGE } from '.';
+import MarkdownEditor from '../components/MarkdownEditor';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -38,6 +39,7 @@ const SellPage = () => {
     image: '',
     largeImage: '',
   });
+  const [activeTab, setActiveTab] = useState();
 
   const [
     createItem,
@@ -87,7 +89,13 @@ const SellPage = () => {
         <h2>Add new item</h2>
         <fieldset disabled={loading} aria-busy={loading}>
           <Field value={title} onChange={handleChange} name="title" required />
-          <Field value={description} onChange={handleChange} name="description" required />
+          <MarkdownEditor
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            name="description"
+            value={description}
+            handleChange={handleChange}
+          />
           <Field
             value={price}
             onChange={handleChange}

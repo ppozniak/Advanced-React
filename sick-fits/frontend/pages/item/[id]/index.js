@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Link from 'next/link';
 import Head from 'next/head';
+import ReactMarkdown from 'react-markdown';
 import formatMoney from '../../../lib/formatMoney';
 import { invalidateItemsCache } from '../../index';
 import useCurrentUser from '../../../hooks/useCurrentUser';
@@ -116,7 +117,8 @@ const Item = () => {
         <CoverPhoto src={largeImage}>{image && <Thumbnail src={image} alt="" />}</CoverPhoto>
       )}
       <h1>{title}</h1>
-      <p>{description}</p>
+
+      <ReactMarkdown source={description} />
 
       <Footer>
         {(isUserAdmin || isUserCreatorOfItem(data.item)) && (

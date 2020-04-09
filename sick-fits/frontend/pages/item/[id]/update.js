@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { gql } from 'apollo-boost';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useRouter } from 'next/router';
@@ -8,6 +8,7 @@ import { Form, Field, useForm } from '../../../components/Form';
 import LogInGuard from '../../../components/LogInGuard';
 import useCurrentUser from '../../../hooks/useCurrentUser';
 import { invalidateItemsCache } from '../../index';
+import MarkdownEditor from '../../../components/MarkdownEditor';
 
 const UPDATE_ITEM_MUTATION = gql`
   mutation UPDATE_ITEM_MUTATION(
@@ -77,6 +78,7 @@ const Update = () => {
   );
 
   const { isUserAdmin, isUserCreatorOfItem } = useCurrentUser();
+  const [activeTab, setActiveTab] = useState();
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error {error.message}</div>;
@@ -103,7 +105,13 @@ const Update = () => {
           <h3>Item ID: {data.item.id}</h3>
           <fieldset disabled={updating} aria-busy={updating}>
             <Field onChange={handleChange} name="title" value={inputs.title} />
-            <Field onChange={handleChange} name="description" value={inputs.description} />
+            <MarkdownEditor
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              name="description"
+              value={inputs.description}
+              handleChange={handleChange}
+            />
             <Field
               onChange={handleChange}
               name="price"

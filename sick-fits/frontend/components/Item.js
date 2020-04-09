@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import ReactMarkdown from 'react-markdown';
 import formatMoney from '../lib/formatMoney';
 
 const ItemContainer = styled.li`
@@ -131,7 +132,15 @@ const Item = ({ title, description, price, image, quantity, handleDelete, loadin
 
       <ContentWrapper>
         <Title>{title}</Title>
-        <p>{description}</p>
+        <p>
+          <ReactMarkdown
+            allowedTypes={['text']}
+            unwrapDisallowed
+            renderers={{ text: ({ value }) => value.concat(' ') }}
+          >
+            {description}
+          </ReactMarkdown>
+        </p>
       </ContentWrapper>
 
       <PriceTag>
