@@ -1,11 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 import styled from 'styled-components';
-import { useMutation } from '@apollo/react-hooks';
 import formatMoney from '../lib/formatMoney';
-import { ADD_TO_CART_MUTATION, CART_QUERY } from './Cart';
 import SickButton from './styles/SickButton';
 import PriceTag from './styles/PriceTag';
+import useAddToCart from '../hooks/useAddToCart';
 
 const ItemContainer = styled.div`
   display: flex;
@@ -50,21 +49,7 @@ const Title = styled.div`
 `;
 
 const ItemCard = ({ title, description, id, price, image, currentUser }) => {
-  const [addToCart, { loading: addingToCart }] = useMutation(ADD_TO_CART_MUTATION, {
-    variables: {
-      itemId: id,
-    },
-    refetchQueries: [
-      {
-        query: CART_QUERY,
-      },
-    ],
-  });
-
-  let buttonText = 'Add to cart';
-
-  if (!currentUser) buttonText = 'Log in to add to cart';
-  else if (addingToCart) buttonText = 'Adding...';
+  const { addToCart, addingToCart, buttonText } = useAddToCart({ id, currentUser });
 
   return (
     <ItemContainer>

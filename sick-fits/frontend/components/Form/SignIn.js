@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/react-hooks';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { Form, Field, useForm } from '.';
-import { CURRENT_USER_QUERY } from '../useCurrentUser';
+import { CURRENT_USER_QUERY } from '../../hooks/useCurrentUser';
 import ErrorMessage from '../ErrorMessage';
 import { CART_QUERY } from '../Cart';
 

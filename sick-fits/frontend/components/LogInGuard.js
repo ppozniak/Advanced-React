@@ -1,5 +1,5 @@
 import React from 'react';
-import useCurrentUser from './useCurrentUser';
+import useCurrentUser from '../hooks/useCurrentUser';
 import SignIn from './Form/SignIn';
 
 const LogInGuard = ({ children }) => {

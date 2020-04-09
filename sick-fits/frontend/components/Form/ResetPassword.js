@@ -3,7 +3,7 @@ import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import { Form, Field, useForm } from '.';
 import ErrorMessage from '../ErrorMessage';
-import { CURRENT_USER_QUERY } from '../useCurrentUser';
+import { CURRENT_USER_QUERY } from '../../hooks/useCurrentUser';
 
 const PASSWORD_RESET_MUTATION = gql`
   mutation PASSWORD_RESET_MUTATION(

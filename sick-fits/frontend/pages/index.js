@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 import ItemCard from '../components/ItemCard';
 import Pagination from '../components/Pagination';
-import useCurrentUser from '../components/useCurrentUser';
+import useCurrentUser from '../hooks/useCurrentUser';
 
 export const invalidateItemsCache = cache => {
   Object.keys(cache.data.data).forEach(key => key.match(/^items/) && cache.data.delete(key)); // Delete all items pages

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import formatMoney from '../../../lib/formatMoney';
 import { invalidateItemsCache } from '../../index';
-import useCurrentUser from '../../../components/useCurrentUser';
+import useCurrentUser from '../../../hooks/useCurrentUser';
 import { CART_QUERY } from '../../../components/Cart';
 
 export const ITEM_QUERY = gql`

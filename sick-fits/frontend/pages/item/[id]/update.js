@@ -6,7 +6,7 @@ import currency from 'currency.js';
 import { ITEM_QUERY } from './index';
 import { Form, Field, useForm } from '../../../components/Form';
 import LogInGuard from '../../../components/LogInGuard';
-import useCurrentUser from '../../../components/useCurrentUser';
+import useCurrentUser from '../../../hooks/useCurrentUser';
 import { invalidateItemsCache } from '../../index';
 
 const UPDATE_ITEM_MUTATION = gql`

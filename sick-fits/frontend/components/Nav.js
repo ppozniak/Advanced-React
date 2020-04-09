@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import NavStyles from './styles/NavStyles';
 import SignOut from './SignOut';
-import useCurrentUser from './useCurrentUser';
+import useCurrentUser from '../hooks/useCurrentUser';
 import { TOGGLE_CART_MUTATION, CartItemsQuantity, CART_QUERY } from './Cart';
 
 const Nav = () => {
