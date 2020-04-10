@@ -1,8 +1,10 @@
-require('dotenv').config({ path: 'variables.env' });
-const cookieParser = require('cookie-parser');
-const createServer = require('./createServer');
-const jwt = require('jsonwebtoken');
-const db = require('./db');
+require("dotenv").config({ path: "variables.env" });
+const cookieParser = require("cookie-parser");
+const createServer = require("./createServer");
+const jwt = require("jsonwebtoken");
+const db = require("./db");
+const bodyParser = require("body-parser");
+const { webhook } = require("./webhook");
 
 const server = createServer();
 
@@ -11,7 +13,7 @@ server.express.use(cookieParser());
 server.express.use((req, res, next) => {
   const { token } = req.cookies;
 
-  if(token) {
+  if (token) {
     const { userId } = jwt.verify(token, process.env.APP_SECRET);
     req.userId = userId;
   }
@@ -21,20 +23,30 @@ server.express.use((req, res, next) => {
 
 // Add currently logged user
 server.express.use(async (req, res, next) => {
-  if(req.userId) {
-    req.user = await db.query.user({
-      where: {
-        id: req.userId,
-      }
-    }, '{ name, email, permissions, id }')
+  if (req.userId) {
+    req.user = await db.query.user(
+      {
+        where: {
+          id: req.userId
+        }
+      },
+      "{ name, email, permissions, id }"
+    );
   }
 
   next();
-})
+});
+
+// Stripe post payment webhook
+server.express.post(
+  "/webhook",
+  bodyParser.raw({ type: "application/json" }),
+  webhook,
+);
 
 server.start({
   cors: {
     credentials: true,
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL
   }
-})
+});

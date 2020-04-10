@@ -13,4 +13,5 @@ async function createPaymentIntent({
 
 module.exports = {
   createPaymentIntent,
+  stripe
 }

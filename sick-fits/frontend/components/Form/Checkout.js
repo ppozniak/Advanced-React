@@ -33,9 +33,21 @@ const CHECKOUT_MUTATION = gql`
   }
 `;
 
+const FINISH_PAYMENT_MUTATION = gql`
+  mutation FINISH_PAYMENT_MUTATION($stripeId: String!, $status: String!) {
+    finishPayment(stripeId: $stripeId, status: $status) {
+      status
+    }
+  }
+`;
+
 const CheckoutForm = () => {
   const { data: cartData, loading: cartLoading, error: cartError } = useQuery(CART_QUERY);
   const [closeCart] = useMutation(CLOSE_CART_MUTATION);
+  const [finishPayment] = useMutation(FINISH_PAYMENT_MUTATION, {
+    refetchQueries: [{ query: ORDERS_QUERY }],
+    awaitRefetchQueries: true,
+  });
   const [startCheckout, { loading: loadingCheckout }] = useMutation(CHECKOUT_MUTATION, {
     refetchQueries: [{ query: ORDERS_QUERY }, { query: CART_QUERY }],
   });
@@ -59,6 +71,7 @@ const CheckoutForm = () => {
       console.log('Elements are not loaded');
       return;
     }
+    setCheckoutDisabled(true);
 
     const cardElement = elements.getElement(CardElement);
     if (cardElement._empty || cardElement._invalid) return;
@@ -80,13 +93,15 @@ const CheckoutForm = () => {
       // Show error to your customer (e.g., insufficient funds)
       NProgress.done();
       setPaymentStatus(result.error.message);
+      setCheckoutDisabled(false);
     } else if (result.paymentIntent.status === 'succeeded') {
-      // The payment has been processed!
-      // Show a success message to your customer
-      // There's a risk of the customer closing the window before callback
-      // execution. Set up a webhook or plugin to listen for the
-      // payment_intent.succeeded event that handles any business critical
-      // post-payment actions.
+      await finishPayment({
+        variables: {
+          stripeId: result.paymentIntent.id,
+          status: result.paymentIntent.status,
+        },
+      });
+
       NProgress.done();
       setPaymentStatus('Success, redirecting to orders...');
       replace('/orders');

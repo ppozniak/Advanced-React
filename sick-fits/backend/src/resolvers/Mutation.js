@@ -1,10 +1,10 @@
-const { forwardTo } = require('prisma-binding');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
-const { transport, createEmailTemplate } = require('../services/mail');
+const { forwardTo } = require("prisma-binding");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { transport, createEmailTemplate } = require("../services/mail");
 const { loggedInGuardian, permissionsGuardian } = require("../utils");
-const { createPaymentIntent } = require('../services/stripe');
+const { createPaymentIntent } = require("../services/stripe");
 
 const SALT_LENGTH = 10;
 const RESET_TOKEN_LENGTH = 20;
@@ -42,26 +42,38 @@ const Mutations = {
   // @TODO: Abstract updateItem and deleteItem to remove DRYness
   updateItem: async (parent, args, ctx, info) => {
     loggedInGuardian(ctx);
-   
-    const item = await ctx.db.query.item({ where: {
-      id: args.where.id
-    }}, '{ user { id } }');
+
+    const item = await ctx.db.query.item(
+      {
+        where: {
+          id: args.where.id
+        }
+      },
+      "{ user { id } }"
+    );
 
     const isUserCreator = ctx.request.user.id === item.user.id;
-    const userHasPermissions = ctx.request.user.permissions.some(permission => ['ADMIN', 'ITEM_UPDATE'].includes(permission));
+    const userHasPermissions = ctx.request.user.permissions.some(permission =>
+      ["ADMIN", "ITEM_UPDATE"].includes(permission)
+    );
 
     if (isUserCreator || userHasPermissions) {
       return ctx.db.mutation.updateItem(args, info);
     } else {
-      throw new Error('You have no rights to update that item.');
+      throw new Error("You have no rights to update that item.");
     }
   },
   deleteItem: async (parent, args, ctx, info) => {
     loggedInGuardian(ctx);
 
-    const item = await ctx.db.query.item({ where: {
-      id: args.where.id
-    }}, '{ user { id } }');
+    const item = await ctx.db.query.item(
+      {
+        where: {
+          id: args.where.id
+        }
+      },
+      "{ user { id } }"
+    );
 
     const isUserCreator = ctx.request.user.id === item.user.id;
     const userHasPermissions = ctx.request.user.permissions.some(permission =>
@@ -216,21 +228,24 @@ const Mutations = {
     // 6. Return user
     return updatedUser;
   },
-  async updatePermissions(parent, {userId, permissions}, ctx, info) {
+  async updatePermissions(parent, { userId, permissions }, ctx, info) {
     loggedInGuardian(ctx);
     // @TODO: Un-hardcode it if there is a way to import enums from graphql
     permissionsGuardian(ctx.request.user, ["ADMIN", "PERMISSION_UPDATE"]);
 
-    const updatedUser = await ctx.db.mutation.updateUser({
-      where: {
-        id: userId
-      },
-      data:{
-        permissions: {
-          set: permissions
+    const updatedUser = await ctx.db.mutation.updateUser(
+      {
+        where: {
+          id: userId
         },
-      }
-    }, info);
+        data: {
+          permissions: {
+            set: permissions
+          }
+        }
+      },
+      info
+    );
 
     return updatedUser;
   },
@@ -251,58 +266,73 @@ const Mutations = {
 
     // If item is there just update the quantity
     if (cartItem) {
-      return ctx.db.mutation.updateCartItem({
-        data: {
-          quantity: cartItem.quantity + 1,
+      return ctx.db.mutation.updateCartItem(
+        {
+          data: {
+            quantity: cartItem.quantity + 1
+          },
+          where: {
+            id: cartItem.id
+          }
         },
-        where: {
-          id: cartItem.id,
-        }
-      }, info);
+        info
+      );
     } else {
       // Otherwise create new CartItem
-      return ctx.db.mutation.createCartItem({
-        data: {
-          item: {
-            connect: {
-              id: itemId,
+      return ctx.db.mutation.createCartItem(
+        {
+          data: {
+            item: {
+              connect: {
+                id: itemId
+              }
+            },
+            user: {
+              connect: {
+                id: ctx.request.userId
+              }
             }
-          },
-          user: {
-            connect: {
-              id: ctx.request.userId,
-            }
-          },
-        }
-      }, info);
+          }
+        },
+        info
+      );
     }
   },
   async removeFromCart(parent, { cartItemId }, ctx, info) {
     loggedInGuardian(ctx);
 
-    const cartItemToDelete = await ctx.db.query.cartItem({ where: {
-      id: cartItemId,
-    } }, `{ user { id } }`);
+    const cartItemToDelete = await ctx.db.query.cartItem(
+      {
+        where: {
+          id: cartItemId
+        }
+      },
+      `{ user { id } }`
+    );
 
     if (cartItemToDelete.user.id !== ctx.request.userId) {
       throw new Error("You have no rights to delete that cart item.");
-    } 
+    }
 
-    return ctx.db.mutation.deleteCartItem({ where: {
-      id: cartItemId,
-    }}, info);
+    return ctx.db.mutation.deleteCartItem(
+      {
+        where: {
+          id: cartItemId
+        }
+      },
+      info
+    );
   },
   async checkout(parent, args, ctx, info) {
     loggedInGuardian(ctx);
 
-    const { cart } = await ctx.db.query
-      .user(
-        {
-          where: {
-            id: ctx.request.userId
-          }
-        },
-        `{ 
+    const { cart } = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId
+        }
+      },
+      `{ 
           cart {
             id, 
             quantity, 
@@ -315,53 +345,102 @@ const Mutations = {
             } 
           }
         }`
-      );
+    );
 
-      const totalCost = cart.reduce(
-        (total, cartItem) => total + cartItem.quantity * cartItem.item.price
-      , 0);
+    const totalCost = cart.reduce(
+      (total, cartItem) => total + cartItem.quantity * cartItem.item.price,
+      0
+    );
 
-      const intent = await createPaymentIntent({
-        amount: totalCost
-      });
+    const intent = await createPaymentIntent({
+      amount: totalCost
+    });
 
-      // Create order
-      await ctx.db.mutation.createOrder({
-        data: {
-          total: totalCost,
-          user: { connect: { id: ctx.request.userId }},
-          items: {
-            create: cart.map(({ item, quantity }) => ({
-              title: item.title,
-              description: item.description,
-              image: item.image,
-              price: item.price,
-              quantity,
-              itemConnection: {
-                connect: {
-                  id: item.id
-                }
+    // Create order
+    await ctx.db.mutation.createOrder({
+      data: {
+        total: totalCost,
+        user: { connect: { id: ctx.request.userId } },
+        items: {
+          create: cart.map(({ item, quantity }) => ({
+            title: item.title,
+            description: item.description,
+            image: item.image,
+            price: item.price,
+            quantity,
+            itemConnection: {
+              connect: {
+                id: item.id
               }
-            }))
-          },
-          payment: {
-            create: {
-              stripeId: intent.id,
-              status: intent.status
+            }
+          }))
+        },
+        payment: {
+          create: {
+            stripeId: intent.id,
+            status: intent.status,
+            user: {
+              connect: {
+                id: ctx.request.userId,
+              }
             }
           }
         }
-      });
+      }
+    });
 
-      // Empty the basket
-      const cartItemsIds = cart.map(({ id }) => id);
-      await ctx.db.mutation.deleteManyCartItems({
+    return { clientSecret: intent["client_secret"] };
+  },
+  finishPayment: async (parent, { stripeId, status }, ctx, info) => {
+    loggedInGuardian(ctx);
+
+    // Check if payment is connected to user.
+    const payment = await ctx.db.query.payment(
+      {
         where: {
-          id_in: cartItemsIds,
+          stripeId
         }
-      });
+      },
+      `{ user { id } }`
+    );
 
-      return { clientSecret: intent['client_secret'] };
+    if (payment.user.id !== ctx.request.userId) {
+      throw new Error("You cannot finish this payment!");
+    }
+
+    const { cart } = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId
+        }
+      },
+      `{ 
+          cart {
+            id, 
+          }
+        }`
+    );
+
+    // Empty the basket
+    const cartItemsIds = cart.map(({ id }) => id);
+    await ctx.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cartItemsIds
+      }
+    });
+
+    // Update the status
+    return ctx.db.mutation.updatePayment(
+      {
+        where: {
+          stripeId
+        },
+        data: {
+          status
+        }
+      },
+      info
+    );
   }
 };
 

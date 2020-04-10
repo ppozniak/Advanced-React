@@ -1,5 +1,5 @@
 # source: https://eu1.prisma.sh/ppozniak95/siccc-fits/dev
-# timestamp: Tue Apr 07 2020 15:08:12 GMT+0100 (British Summer Time)
+# timestamp: Fri Apr 10 2020 18:02:11 GMT+0100 (British Summer Time)
 
 type AggregateCartItem {
   count: Int!
@@ -770,38 +770,38 @@ type Mutation {
   createOrder(data: OrderCreateInput!): Order!
   createItem(data: ItemCreateInput!): Item!
   createPayment(data: PaymentCreateInput!): Payment!
-  createUser(data: UserCreateInput!): User!
   createOrderItem(data: OrderItemCreateInput!): OrderItem!
+  createUser(data: UserCreateInput!): User!
   updateCartItem(data: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem
   updateOrder(data: OrderUpdateInput!, where: OrderWhereUniqueInput!): Order
   updateItem(data: ItemUpdateInput!, where: ItemWhereUniqueInput!): Item
   updatePayment(data: PaymentUpdateInput!, where: PaymentWhereUniqueInput!): Payment
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateOrderItem(data: OrderItemUpdateInput!, where: OrderItemWhereUniqueInput!): OrderItem
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteCartItem(where: CartItemWhereUniqueInput!): CartItem
   deleteOrder(where: OrderWhereUniqueInput!): Order
   deleteItem(where: ItemWhereUniqueInput!): Item
   deletePayment(where: PaymentWhereUniqueInput!): Payment
-  deleteUser(where: UserWhereUniqueInput!): User
   deleteOrderItem(where: OrderItemWhereUniqueInput!): OrderItem
+  deleteUser(where: UserWhereUniqueInput!): User
   upsertCartItem(where: CartItemWhereUniqueInput!, create: CartItemCreateInput!, update: CartItemUpdateInput!): CartItem!
   upsertOrder(where: OrderWhereUniqueInput!, create: OrderCreateInput!, update: OrderUpdateInput!): Order!
   upsertItem(where: ItemWhereUniqueInput!, create: ItemCreateInput!, update: ItemUpdateInput!): Item!
   upsertPayment(where: PaymentWhereUniqueInput!, create: PaymentCreateInput!, update: PaymentUpdateInput!): Payment!
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertOrderItem(where: OrderItemWhereUniqueInput!, create: OrderItemCreateInput!, update: OrderItemUpdateInput!): OrderItem!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyCartItems(data: CartItemUpdateManyMutationInput!, where: CartItemWhereInput): BatchPayload!
   updateManyOrders(data: OrderUpdateManyMutationInput!, where: OrderWhereInput): BatchPayload!
   updateManyItems(data: ItemUpdateManyMutationInput!, where: ItemWhereInput): BatchPayload!
   updateManyPayments(data: PaymentUpdateManyMutationInput!, where: PaymentWhereInput): BatchPayload!
-  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   updateManyOrderItems(data: OrderItemUpdateManyMutationInput!, where: OrderItemWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   deleteManyCartItems(where: CartItemWhereInput): BatchPayload!
   deleteManyOrders(where: OrderWhereInput): BatchPayload!
   deleteManyItems(where: ItemWhereInput): BatchPayload!
   deleteManyPayments(where: PaymentWhereInput): BatchPayload!
-  deleteManyUsers(where: UserWhereInput): BatchPayload!
   deleteManyOrderItems(where: OrderItemWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -1640,6 +1640,7 @@ type Payment implements Node {
   id: ID!
   stripeId: String!
   status: String!
+  user: User!
 }
 
 """A connection to a list of items."""
@@ -1656,6 +1657,7 @@ input PaymentCreateInput {
   id: ID
   stripeId: String!
   status: String!
+  user: UserCreateOneInput!
 }
 
 input PaymentCreateOneInput {
@@ -1727,11 +1729,13 @@ input PaymentSubscriptionWhereInput {
 input PaymentUpdateDataInput {
   stripeId: String
   status: String
+  user: UserUpdateOneRequiredInput
 }
 
 input PaymentUpdateInput {
   stripeId: String
   status: String
+  user: UserUpdateOneRequiredInput
 }
 
 input PaymentUpdateManyMutationInput {
@@ -1880,6 +1884,7 @@ input PaymentWhereInput {
 
   """All values not ending with the given string."""
   status_not_ends_with: String
+  user: UserWhereInput
 }
 
 input PaymentWhereUniqueInput {
@@ -1901,20 +1906,20 @@ type Query {
   orders(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Order]!
   items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item]!
   payments(where: PaymentWhereInput, orderBy: PaymentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Payment]!
-  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   orderItems(where: OrderItemWhereInput, orderBy: OrderItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [OrderItem]!
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   cartItem(where: CartItemWhereUniqueInput!): CartItem
   order(where: OrderWhereUniqueInput!): Order
   item(where: ItemWhereUniqueInput!): Item
   payment(where: PaymentWhereUniqueInput!): Payment
-  user(where: UserWhereUniqueInput!): User
   orderItem(where: OrderItemWhereUniqueInput!): OrderItem
+  user(where: UserWhereUniqueInput!): User
   cartItemsConnection(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartItemConnection!
   ordersConnection(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderConnection!
   itemsConnection(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ItemConnection!
   paymentsConnection(where: PaymentWhereInput, orderBy: PaymentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PaymentConnection!
-  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   orderItemsConnection(where: OrderItemWhereInput, orderBy: OrderItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderItemConnection!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -1928,8 +1933,8 @@ type Subscription {
   order(where: OrderSubscriptionWhereInput): OrderSubscriptionPayload
   item(where: ItemSubscriptionWhereInput): ItemSubscriptionPayload
   payment(where: PaymentSubscriptionWhereInput): PaymentSubscriptionPayload
-  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   orderItem(where: OrderItemSubscriptionWhereInput): OrderItemSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
 type User implements Node {

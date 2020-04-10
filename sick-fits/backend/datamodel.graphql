@@ -11,6 +11,7 @@ type Payment {
   id: ID! @id
   stripeId: String! @unique
   status: String!
+  user: User!
 }
 
 type User {
