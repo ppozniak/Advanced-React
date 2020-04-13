@@ -12,8 +12,9 @@ type SuccessMessage {
   message: String
 }
 
-type CheckoutClientSecret {
+type CheckoutResults {
   clientSecret: String!
+  orderId: ID!
 }
 
 type Mutation {
@@ -33,7 +34,7 @@ type Mutation {
   updatePermissions(userId: ID!, permissions: [Permission]!): User
   addToCart(itemId: ID!): CartItem!
   removeFromCart(cartItemId: ID!): CartItem!
-  checkout: CheckoutClientSecret!
+  checkout: CheckoutResults!
   finishPayment(stripeId: String!, status: String!): Payment!
 }
 
@@ -49,6 +50,7 @@ type Query {
   currentUser: User
   users: [User]!
   orders: [Order]!
+  order(orderId: ID!): Order
 }
 
 type User {

@@ -357,7 +357,7 @@ const Mutations = {
     });
 
     // Create order
-    await ctx.db.mutation.createOrder({
+    const order = await ctx.db.mutation.createOrder({
       data: {
         total: totalCost,
         user: { connect: { id: ctx.request.userId } },
@@ -387,9 +387,17 @@ const Mutations = {
           }
         }
       }
+    }, `{ id }`);
+
+    // Empty the basket
+    const cartItemsIds = cart.map(({ id }) => id);
+    await ctx.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cartItemsIds
+      }
     });
 
-    return { clientSecret: intent["client_secret"] };
+    return { clientSecret: intent["client_secret"], orderId: order.id };
   },
   finishPayment: async (parent, { stripeId, status }, ctx, info) => {
     loggedInGuardian(ctx);
@@ -420,14 +428,6 @@ const Mutations = {
           }
         }`
     );
-
-    // Empty the basket
-    const cartItemsIds = cart.map(({ id }) => id);
-    await ctx.db.mutation.deleteManyCartItems({
-      where: {
-        id_in: cartItemsIds
-      }
-    });
 
     // Update the status
     return ctx.db.mutation.updatePayment(

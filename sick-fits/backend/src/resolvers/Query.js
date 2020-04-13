@@ -33,6 +33,17 @@ const Query = {
         id: ctx.request.userId
       }
     } }, info);
+  },
+  async order(parent, { orderId }, ctx, info) {
+    loggedInGuardian(ctx);
+
+    const { user: { id } } = await ctx.db.query.order({ where: { id: orderId } }, `{ user { id } }`);
+
+    if (id !== ctx.request.userId) {
+      throw new Error("This is not your order, you cannot view it!");
+    }
+
+    return await ctx.db.query.order({ where: { id: orderId } }, info);
   }
 };
 

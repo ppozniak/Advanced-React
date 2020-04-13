@@ -29,11 +29,12 @@ const CHECKOUT_MUTATION = gql`
   mutation CHECKOUT_MUTATION {
     checkout {
       clientSecret
+      orderId
     }
   }
 `;
 
-const FINISH_PAYMENT_MUTATION = gql`
+export const FINISH_PAYMENT_MUTATION = gql`
   mutation FINISH_PAYMENT_MUTATION($stripeId: String!, $status: String!) {
     finishPayment(stripeId: $stripeId, status: $status) {
       status
@@ -79,7 +80,7 @@ const CheckoutForm = () => {
     NProgress.start();
     const {
       data: {
-        checkout: { clientSecret },
+        checkout: { clientSecret, orderId },
       },
     } = await startCheckout();
 
@@ -90,10 +91,9 @@ const CheckoutForm = () => {
     });
 
     if (result.error) {
-      // Show error to your customer (e.g., insufficient funds)
       NProgress.done();
       setPaymentStatus(result.error.message);
-      setCheckoutDisabled(false);
+      replace(`/payment?orderId=${orderId}&errorMessage=${result.error.message}`);
     } else if (result.paymentIntent.status === 'succeeded') {
       await finishPayment({
         variables: {

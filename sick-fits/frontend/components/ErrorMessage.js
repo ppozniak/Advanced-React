@@ -19,7 +19,9 @@ const ErrorStyles = styled.div`
 `;
 
 const DisplayError = ({ error }) => {
-  if (!error || !error.message) return null;
+  if (!error) return null;
+
+  // Multiple graphql errors
   if (error.networkError && error.networkError.result && error.networkError.result.errors.length) {
     return error.networkError.result.errors.map((error, i) => (
       <ErrorStyles key={i}>
@@ -27,11 +29,20 @@ const DisplayError = ({ error }) => {
       </ErrorStyles>
     ));
   }
-  return (
-    <ErrorStyles>
-      <p data-test="graphql-error">{error.message.replace('GraphQL error: ', '')}</p>
-    </ErrorStyles>
-  );
+  if (error.message) {
+    return (
+      <ErrorStyles>
+        <p data-test="graphql-error">{error.message.replace('GraphQL error: ', '')}</p>
+      </ErrorStyles>
+    );
+  }
+  if (typeof error === 'string') {
+    return (
+      <ErrorStyles>
+        <p>{error}</p>
+      </ErrorStyles>
+    );
+  }
 };
 
 DisplayError.defaultProps = {
@@ -39,7 +50,7 @@ DisplayError.defaultProps = {
 };
 
 DisplayError.propTypes = {
-  error: PropTypes.object,
+  error: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
 };
 
 export default DisplayError;
