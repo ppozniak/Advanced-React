@@ -1,6 +1,6 @@
 import React from 'react';
 import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import styled from 'styled-components';
 import { formatRelative } from 'date-fns';
 import Link from 'next/link';
@@ -104,7 +104,16 @@ const OrdersPage = () => {
           <Order key={id}>
             <OrderHeader>
               <RelativeDate>{formatRelative(new Date(createdAt), new Date())}</RelativeDate>
-              <PaymentStatus>{payment.status}</PaymentStatus>
+              <div>
+                {payment.status !== 'succeeded' && (
+                  <>
+                    <Link href={`/payment?orderId=${id}`}>
+                      <a>Retry payment</a>
+                    </Link>
+                  </>
+                )}
+                <PaymentStatus>{payment.status}</PaymentStatus>
+              </div>
             </OrderHeader>
             <ItemsList>
               {items.map(({ id, title, description, image, itemConnection, price, quantity }) => {
