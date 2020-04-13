@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { transport, createEmailTemplate } = require("../services/mail");
 const { loggedInGuardian, permissionsGuardian } = require("../utils");
-const { createPaymentIntent } = require("../services/stripe");
+const { createPaymentIntent, stripe } = require("../services/stripe");
 
 const SALT_LENGTH = 10;
 const RESET_TOKEN_LENGTH = 20;
@@ -416,19 +416,6 @@ const Mutations = {
       throw new Error("You cannot finish this payment!");
     }
 
-    const { cart } = await ctx.db.query.user(
-      {
-        where: {
-          id: ctx.request.userId
-        }
-      },
-      `{ 
-          cart {
-            id, 
-          }
-        }`
-    );
-
     // Update the status
     return ctx.db.mutation.updatePayment(
       {
@@ -441,6 +428,27 @@ const Mutations = {
       },
       info
     );
+  },
+  retryPayment: async (parent, { stripeId }, ctx, info) => {
+    loggedInGuardian(ctx);
+
+    // Check if payment is connected to user.
+    const payment = await ctx.db.query.payment(
+      {
+        where: {
+          stripeId
+        }
+      },
+      `{ user { id } }`
+    );
+
+    if (payment.user.id !== ctx.request.userId) {
+      throw new Error("This is not your payment!");
+    }
+
+    const intent = await stripe.paymentIntents.retrieve(stripeId);
+
+    return { clientSecret: intent.client_secret }
   }
 };
 
